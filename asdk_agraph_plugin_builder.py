@@ -54,10 +54,10 @@ def _run_command(command_array, message):
         return False
 
 
-def _update_asdk_repo_codegen_section(plugin_module_name, api_name, api_version, api_module_path,
-                                      target_api_directory, target_domain_module_location):
+def _update_asdk_plugin_codegen_section(plugin_module_name, api_name, api_version, api_module_path,
+                                        target_api_directory, target_domain_module_location):
     """
-    Method to update ASDK's codegen sections. Particularly code generated APIs list yaml file.
+    Method to update ASDK plugin's codegen sections. Particularly code generated APIs list file.
     This method assumes rest of the codegen steps are complete and swagger json file is present in target api location
     """
     domain_api_list_filepath = os.path.join(target_domain_module_location, plugin_module_name, "domain_apis_list.json")
@@ -187,10 +187,10 @@ def _onboard_api_using_swagger(plugin_module_name, path_to_agraph_openapi_spec_f
             _run_command(cp_command_requirements,
                          message=f"[API: {api_name}-{api_ver}] - Copy requirements file under target directory")
 
-    print(f"[API: {api_name}-{api_ver}] - Openapi codegen steps done. Proceeding with ASDK updates...")
-    _update_asdk_repo_codegen_section(plugin_module_name=plugin_module_name, api_name=api_name, api_version=api_ver,
-                                      api_module_path=api_module_path, target_api_directory=target_api_directory,
-                                      target_domain_module_location=target_domain_module_location)
+    print(f"[API: {api_name}-{api_ver}] - Openapi codegen steps done. Proceeding with ASDK Plugin updates...")
+    _update_asdk_plugin_codegen_section(plugin_module_name=plugin_module_name, api_name=api_name, api_version=api_ver,
+                                        api_module_path=api_module_path, target_api_directory=target_api_directory,
+                                        target_domain_module_location=target_domain_module_location)
 
     if is_successful:
         print(f"[API: {api_name}-{api_ver}] - API Onboarding complete. Result: 'success'")
