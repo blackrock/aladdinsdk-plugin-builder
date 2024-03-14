@@ -5,7 +5,7 @@ name: Quality Check - AladdinSDK Plugin Builder
 
 on:
   push:
-    branches: [ "*" ]
+    branches: [ "*", "feat/*" ]
   pull_request:
     branches: [ "main", "develop" ]
 
