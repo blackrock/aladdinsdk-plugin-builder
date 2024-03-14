@@ -36,13 +36,13 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics
     - name: Build plugin packages
       run: |
-        ls ./temp
-        python asdk_agraph_plugin_builder.py -tl ./temp -pv 0.0.1a1
+        mkdir ${{ runner.temp }}/build_results
+        python asdk_agraph_plugin_builder.py -tl ${{ runner.temp }}/build_results -pv 0.0.1a1
     - name: (TEMP) Upload build results
       uses: actions/upload-artifact@v3
       with:
         name: aladdinsdk-plugins
-        path: ./temp/*
+        path: ${{ runner.temp }}/build_results
       if: ${{ always() }}
     # - name: Publish package
     #   uses: pypa/gh-action-pypi-publish@release/v1
