@@ -1,10 +1,11 @@
-# Open Source Template
+# AladdinSDK Plugin Builder
 
-Description of the project.
+This project builds API bundle plugins for AladdinSDK using swagger specifications. The valid Aladdin API specifications are to be included in the appropriate plugin directory [here](/resources/swagger_plugin_bundles/).
+
 
 ## Table of Contents
 
-- [Open Source Template](#open-source-template)
+- [AladdinSDK Plugin Builder](#aladdinsdk-plugin-builder)
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
   - [Usage](#usage)
@@ -15,15 +16,35 @@ Description of the project.
 
 ## Installation
 
-Instructions for installing and configuring the project.
+The plugins will be built via Github Actions on this repository. 
+
+_For local development refer [Contributing](#contributing) section._
 
 ## Usage
 
-Examples and instructions for using the project.
+To update contents of any plugin, or to create/delete plugins, update the directory structure and contents under [swagger_plugin_bundles](/resources/swagger_plugin_bundles/).
+
+For Aladdin's Graph APIs, the specification should include the following details:
+- `info.x-aladdin-spec-id` - ID given in the following format `agraph.<domain name>.<segment name>.<api group>.<version>.<API Name>`
+- Path security definitions
+
+### Requirements to run the script:
+- Python (v3.9+)
+- Java (to run openapi-generator-cli jar to perform codegen using swagger file)
+- Openapi-generator-cli jar OR ability to `wget` jar from maven
+- Target location to where the python project needs to be created
+- Plugin version (should correspond to agraph version of swagger gen files)
 
 ## Contributing
 
-Guidelines for contributing to the project. link to CONTRIBUTING.md and CODE_OF_CONDUCT.md
+- The main entry point of the project is asdk_agraph_plugin_builder.py, and houses the core logic of how to read an AGraph swagger specification.
+- API bundles are under /resources/swagger_plugin_bundles.
+- The builder creates plugins which contain the following:
+  - API client code bundled under appropriate paths derived from spec ID
+  - `api_registry.py` and `domain_apis_list.json` files to help the core AladdinSDK read contents of the plugin
+  - `pyproject.toml` configuration file used by packaging tools
+
+Also refer [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 
 ## License
 
