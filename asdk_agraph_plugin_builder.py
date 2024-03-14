@@ -305,8 +305,8 @@ def print_run_summary(summary_map):
                       f"skipped due to errors: {len(_skipped_due_to_errors)}, filtered out: {len(_skipped_due_to_filtering)}]")
                 print(f"\nCompleted APIs: {[x for x in _completed_apis_to_spec_map]}")
                 print("------------------------------------")
-                total_completed_apis += len(_completed_apis_to_spec_map)
-                total_failed_apis += len(_skipped_due_to_errors)
+        total_completed_apis += len(_completed_apis_to_spec_map)
+        total_failed_apis += len(_skipped_due_to_errors)
     print(f"\n\nTotal - completed: {total_completed_apis}, failed: {total_failed_apis}")
 
 
