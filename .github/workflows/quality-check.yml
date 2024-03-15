@@ -16,13 +16,21 @@ jobs:
   pre-build-setup:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-plugin-name-matrix.outputs.matrix }}
+      matrix: ${{ steps.set-plugin-names-matrix.outputs.matrix }}
     steps:
     - uses: actions/checkout@v3
     - id: try-getting-plugin-names
       run: ls resources/swagger_plugin_bundles
-    - id: set-plugin-name-matrix
-      run: echo "::set-output name=matrix::{\"include\":[{\"plugin\":\"accounting\"},{\"plugin\":\"trading\"}]}"
+    - id: set-plugin-names-matrix
+      run: |
+        set_output_str_builder="::set-output name=matrix::{\"include\":["
+        for bundle_suffix in resources/swagger_plugin_bundles; do
+          if [ -d "$bundle_suffix" ]; then
+            set_output_str_builder=$set_output_str_builder + "{\"plugin\":\"$bundle_suffix\"},"
+          fi
+        done
+        set_output_str_builder=$set_output_str_builder + "]}"
+        echo "$set_output_str_builder"
   build:
     needs: pre-build-setup
     runs-on: ubuntu-latest
