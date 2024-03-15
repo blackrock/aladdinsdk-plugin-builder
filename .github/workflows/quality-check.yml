@@ -18,10 +18,21 @@ jobs:
     outputs:
       matrix: ${{ steps.set-plugin-names-matrix.outputs.matrix }}
     steps:
-    - uses: actions/checkout@v3
-    - id: try-getting-plugin-names
-      run: ls resources/swagger_plugin_bundles
-    - id: set-plugin-names-matrix
+    - name: Checkout project
+      uses: actions/checkout@v3
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 setuptools build
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics
+    - name: Create build plugin matrix
+      id: set-plugin-names-matrix
       run: |
         set_output_str_builder="{\"include\":["
         for bundle_path in resources/swagger_plugin_bundles/*; do
@@ -37,8 +48,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{fromJson(needs.pre-build-setup.outputs.matrix)}}
+    name: Build and Publish asdk-plugin-${{ matrix.plugin }}
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout project
+      uses: actions/checkout@v3
     - name: Set up Python 3.9
       uses: actions/setup-python@v3
       with:
@@ -48,12 +61,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 setuptools build
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics
     - name: Build plugin packages
       run: |
         mkdir -p ${{ runner.temp }}/build_results/${{ matrix.plugin }}
@@ -69,14 +76,3 @@ jobs:
     #   with:
     #     packages-dir: ${{ runner.temp }}/build_results/
     #     password: ${{ secrets.SIMPYL_TOKEN_PYPI }}
-    # - name: Loop through directories
-    #   run: |
-    #     for subdir_domain in "${{ runner.temp }}/build_results"/*; do
-    #       if [ -d "$subdir_domain" ]; then
-    #         echo "==================== $subdir_domain ============================="
-    #         package_name=$(basename "$subdir_domain")
-    #         cd $subdir_domain
-    #         ls
-    #         echo "================================================="
-    #       fi
-    #     done
