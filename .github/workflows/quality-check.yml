@@ -31,6 +31,7 @@ jobs:
             fi
         done
         set_output_str_builder+="]}}"
+        echo "{matrix}=$set_output_str_builder"
         echo "{matrix}=$set_output_str_builder" >> $GITHUB_OUTPUT
   build:
     needs: pre-build-setup
