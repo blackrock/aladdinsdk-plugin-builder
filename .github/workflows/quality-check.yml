@@ -61,7 +61,4 @@ jobs:
                   echo "================================================="
                 fi
               done
-        # echo "Publishing artifacts for directory ${{ item.path }}"
-        # github.actions.upload-artifact@v3 name="artifacts-${{ item.path }}" path="${{ item.path }}"
-        # github.actions.create-release@v3 name="release-${{ item.path }}" tag="v1.0.0" body="This is a release for directory ${{ item.path }}"
   
