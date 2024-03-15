@@ -48,7 +48,7 @@ jobs:
     - name: Build plugin packages
       run: |
         mkdir -p ${{ runner.temp }}/build_results/${{ matrix.plugin }}
-        python asdk_agraph_plugin_builder.py -tl ${{ runner.temp }}/build_results -pv 0.0.1a1 -sb resources/swagger_plugin_bundles/${{ matrix.plugin }}/
+        python asdk_agraph_plugin_builder.py -tl ${{ runner.temp }}/build_results/${{ matrix.plugin }} -pv 0.0.1a1 -sb resources/swagger_plugin_bundles/${{ matrix.plugin }}
     - name: (TEMP) Upload build results
       uses: actions/upload-artifact@v3
       with:
