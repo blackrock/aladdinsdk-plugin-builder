@@ -38,12 +38,12 @@ jobs:
       run: |
         mkdir ${{ runner.temp }}/build_results
         python asdk_agraph_plugin_builder.py -tl ${{ runner.temp }}/build_results -pv 0.0.1a1
-    - name: (TEMP) Upload build results
-      uses: actions/upload-artifact@v3
-      with:
-        name: aladdinsdk-plugins
-        path: ${{ runner.temp }}/build_results
-      if: ${{ always() }}
+    # - name: (TEMP) Upload build results
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: aladdinsdk-plugins
+    #     path: ${{ runner.temp }}/build_results
+    #   if: ${{ always() }}
     # - name: Publish package
     #   uses: pypa/gh-action-pypi-publish@release/v1
     #   with:
@@ -56,8 +56,10 @@ jobs:
         for subdir_domain in "${{ runner.temp }}/build_results"/*; do
                 if [ -d "$subdir_domain" ]; then
                   echo "==================== $subdir_domain ============================="
+                  package_name=$(basename "$subdir_domain")
                   cd $subdir_domain
                   ls
+                  github.actions.upload-artifact@v3 name="artifacts-$package_name" path="$subdir_domain"
                   echo "================================================="
                 fi
               done
