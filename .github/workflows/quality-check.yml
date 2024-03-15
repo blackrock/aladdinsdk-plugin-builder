@@ -31,13 +31,12 @@ jobs:
             fi
         done
         set_output_str_builder+="]}}"
-        echo "{matrix}=$set_output_str_builder"
-        echo "{matrix}=$set_output_str_builder" >> $GITHUB_OUTPUT
+        echo "{matrix}=$set_output_str_builder" >> $env:$GITHUB_OUTPUT
   build:
     needs: pre-build-setup
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{needs.pre-build-setup.outputs.matrix}}
+      matrix: ${{fromJson(needs.pre-build-setup.outputs.matrix)}}
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.9
