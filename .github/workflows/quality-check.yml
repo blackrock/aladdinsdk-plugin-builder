@@ -55,9 +55,10 @@ jobs:
       run: |
         for subdir_domain in "${{ runner.temp }}/build_results"/*; do
                 if [ -d "$subdir_domain" ]; then
-                  echo "================================================="
-                  pwd
+                  echo "==================== $subdir_domain ============================="
+                  cd $subdir_domain
                   ls
+                  github.actions.upload-artifact@v3 name="artifacts-${{ item.path }}" path="${{ item.path }}"
                   echo "================================================="
                 fi
               done
