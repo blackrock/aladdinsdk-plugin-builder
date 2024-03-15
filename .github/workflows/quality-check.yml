@@ -58,7 +58,6 @@ jobs:
                   echo "==================== $subdir_domain ============================="
                   cd $subdir_domain
                   ls
-                  github.actions.upload-artifact@v3 name="artifacts-${{ item.path }}" path="${{ item.path }}"
                   echo "================================================="
                 fi
               done
