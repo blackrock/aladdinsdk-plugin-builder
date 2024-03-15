@@ -22,7 +22,7 @@ jobs:
     - id: try-getting-plugin-names
       run: ls resources/swagger_plugin_bundles
     - id: set-plugin-name-matrix
-      run: echo "::set-output name=matrix::{\"include\":[\"foo\",\"bar\",\"baz\"]}"
+      run: echo "::set-output name=matrix::{\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}"
   build:
     needs: pre-build-setup
     runs-on: ubuntu-latest
