@@ -47,4 +47,21 @@ jobs:
     # - name: Publish package
     #   uses: pypa/gh-action-pypi-publish@release/v1
     #   with:
+    #     packages-dir: ${{ runner.temp }}/build_results/
     #     password: ${{ secrets.SIMPYL_TOKEN_PYPI }}
+    - uses: actions/checkout@v3
+    - name: Loop through directories
+      # foreach: ${{ github.event.inputs.directories }}
+      run: |
+        for subdir_domain in "${{ runner.temp }}/build_results"/*; do
+                if [ -d "$subdir_domain" ]; then
+                  echo "================================================="
+                  pwd
+                  ls
+                  echo "================================================="
+                fi
+              done
+        # echo "Publishing artifacts for directory ${{ item.path }}"
+        # github.actions.upload-artifact@v3 name="artifacts-${{ item.path }}" path="${{ item.path }}"
+        # github.actions.create-release@v3 name="release-${{ item.path }}" tag="v1.0.0" body="This is a release for directory ${{ item.path }}"
+  
