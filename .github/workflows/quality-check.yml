@@ -13,8 +13,21 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  pre-build-setup:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-plugin-name-matrix.outputs.matrix }}
+    steps:
+    - uses: actions/checkout@v3
+    - id: try-getting-plugin-names
+      run: ls resources/swagger_plugin_bundles
+    - id: set-plugin-name-matrix
+      run: echo "::set-output name=matrix::{\"include\":[\"foo\",\"bar\",\"baz\"]}"
+  build:
+    needs: pre-build-setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.pre-build-setup.outputs.matrix)}}
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.9
@@ -58,20 +71,3 @@ jobs:
             echo "================================================="
           fi
         done
-
-  upload:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-    - name: Loop through directories 2
-      run: |
-        for subdir_domain in "${{ runner.temp }}/build_results"/*; do
-          if [ -d "$subdir_domain" ]; then
-            echo "==================== $subdir_domain ============================="
-            package_name=$(basename "$subdir_domain")
-            cd $subdir_domain
-            ls
-            echo "================================================="
-          fi
-        done
-  
