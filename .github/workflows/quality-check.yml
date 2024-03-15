@@ -23,7 +23,7 @@ jobs:
       run: ls resources/swagger_plugin_bundles
     - id: set-plugin-names-matrix
       run: |
-        set_output_str_builder="::set-output name=matrix::{\"include\":["
+        set_output_str_builder="{matrix}={\"include\":["
         for bundle_path in resources/swagger_plugin_bundles/*; do
             if [ -d "$bundle_path" ]; then
                 bundle_suffix=$(basename $bundle_path)
@@ -31,7 +31,7 @@ jobs:
             fi
         done
         set_output_str_builder+="]}"
-        echo "$set_output_str_builder"
+        echo "$set_output_str_builder" >> $GITHUB_STATE
   build:
     needs: pre-build-setup
     runs-on: ubuntu-latest
