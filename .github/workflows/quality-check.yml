@@ -19,7 +19,7 @@ jobs:
       matrix: ${{ steps.set-plugin-names-matrix.outputs.matrix }}
     steps:
     - name: Checkout project
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -51,9 +51,9 @@ jobs:
     name: Build and Publish asdk-plugin-${{ matrix.plugin }}
     steps:
     - name: Checkout project
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Set up Python 3.9
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: "3.9"
     - name: Install dependencies
@@ -66,7 +66,7 @@ jobs:
         mkdir -p ${{ runner.temp }}/build_results/${{ matrix.plugin }}
         python asdk_agraph_plugin_builder.py -tl ${{ runner.temp }}/build_results/${{ matrix.plugin }} -pv 0.0.1a1 -sb resources/swagger_plugin_bundles/${{ matrix.plugin }}
     - name: (TEMP) Upload build results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: asdk-plugin-${{ matrix.plugin }}-artifact
         path: ${{ runner.temp }}/build_results/${{ matrix.plugin }}
