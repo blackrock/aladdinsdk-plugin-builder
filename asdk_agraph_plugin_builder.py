@@ -353,9 +353,8 @@ if __name__ == "__main__":
     # Add these details to a summary map that will be printed out at the end of execution
     summary_map = {}
     for plugin_name, api_swagger_files in _run_config_content.items():
-        target_domain_module_location = os.path.join(_target_location, plugin_name)
         _completed_apis_to_spec_map, _skipped_api_specs_to_reason_map = create_plugin_content(api_swagger_files, plugin_name,
-                                                                                              target_domain_module_location, _plugin_version)
+                                                                                              _target_location, _plugin_version)
         summary_map[plugin_name] = (_completed_apis_to_spec_map, _skipped_api_specs_to_reason_map)
 
     print_run_summary(summary_map)
