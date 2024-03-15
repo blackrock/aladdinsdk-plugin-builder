@@ -20,7 +20,7 @@ if 'Windows' in platform_os:
     _ASDK_PLUGIN_BUILDER_REPO = pathlib.PureWindowsPath(os.getcwd()).as_posix()
 
 _openapi_generator_jar_filepath = os.path.join(_ASDK_PLUGIN_BUILDER_REPO, 'resources', 'openapi-generator-cli.jar')
-_swagger_plugin_bundler_path = os.path.join(_ASDK_PLUGIN_BUILDER_REPO, 'resources', 'swagger_plugin_bundles')
+# _swagger_plugin_bundler_path = os.path.join(_ASDK_PLUGIN_BUILDER_REPO, 'resources', 'swagger_plugin_bundles')
 
 
 # Helper methods
@@ -313,6 +313,7 @@ def print_run_summary(summary_map):
 # --------------------------------------------------- start ---------------------------------------------------
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="ASDK Codegen Util", description="Utility to generate python clients for aladdin-graph APIs")
+    parser.add_argument('-sb', '--swagger-bundle', help="Path to directory containing swagger files to be bundled in plugin")
     parser.add_argument('-tl', '--target-location', help="Target location where plugin libraries should be created")
     parser.add_argument('-pv', '--plugin-version', help="Tag version of domain plugin artifacts")
     parser.add_argument('-oj', '--openapi-generator-cli-jar', help="(Optional) Path to openapi-generator-cli jar. If not provided, "
@@ -323,6 +324,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(f"Run args: {args}")
 
+    # source
+    _swagger_bundle_path = args.swagger_bundle
     # generator jar
     _custom_openapi_generator_jar_filepath = args.openapi_generator_cli_jar
     # output
@@ -340,12 +343,11 @@ if __name__ == "__main__":
 
     # Read swagger directory structure to create APIs groupings for each plugin
     _run_config_content = {}
-    for root, dirs, _ in os.walk(_swagger_plugin_bundler_path):
-        for plugin_dir in dirs:
-            plugin_name = _ASDK_PLUGIN_MODULE_PREFIX + plugin_dir
-            for plugin_dir_root, _, files in os.walk(os.path.join(root, plugin_dir)):
-                complete_swagger_filepaths = [os.path.join(plugin_dir_root, x) for x in files]
-                _run_config_content[plugin_name] = complete_swagger_filepaths
+    plugin_dir = os.path.basename(_swagger_bundle_path)
+    plugin_name = _ASDK_PLUGIN_MODULE_PREFIX + plugin_dir
+    for plugin_dir_root, _, files in os.walk(_swagger_bundle_path):
+        complete_swagger_filepaths = [os.path.join(plugin_dir_root, x) for x in files]
+        _run_config_content[plugin_name] = complete_swagger_filepaths
 
     # Run plugin builder logic for each key in run config map. Create method responds with completed/skipped APIs within the plugin build.
     # Add these details to a summary map that will be printed out at the end of execution

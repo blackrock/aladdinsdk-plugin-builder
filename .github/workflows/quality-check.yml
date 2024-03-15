@@ -22,7 +22,7 @@ jobs:
     - id: try-getting-plugin-names
       run: ls resources/swagger_plugin_bundles
     - id: set-plugin-name-matrix
-      run: echo "::set-output name=matrix::{\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}"
+      run: echo "::set-output name=matrix::{\"include\":[{\"plugin\":\"accounting\"},{\"plugin\":\"trading\"}]}"
   build:
     needs: pre-build-setup
     runs-on: ubuntu-latest
@@ -36,6 +36,7 @@ jobs:
         python-version: "3.9"
     - name: Install dependencies
       run: |
+        echo ${{ matrix }}
         python -m pip install --upgrade pip
         pip install flake8 setuptools build
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
@@ -47,7 +48,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics
     - name: Build plugin packages
       run: |
-        mkdir ${{ runner.temp }}/build_results
+        mkdir ${{ runner.temp }}/build_results/${{ matrix }}
         python asdk_agraph_plugin_builder.py -tl ${{ runner.temp }}/build_results -pv 0.0.1a1
     # - name: (TEMP) Upload build results
     #   uses: actions/upload-artifact@v3
