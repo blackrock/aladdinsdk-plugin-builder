@@ -37,8 +37,11 @@ For Aladdin's Graph APIs, the specification should include the following details
 
 ## Contributing
 
-- The main entry point of the project is asdk_agraph_plugin_builder.py, and houses the core logic of how to read an AGraph swagger specification.
-- API bundles are under /resources/swagger_plugin_bundles.
+- The main entry point of the project is asdk_agraph_plugin_builder.py, and houses the core logic of how to read an AGraph swagger specification. The script requires the following inputs:
+  - `-sb` / `--swagger-bundle`: Path to a directory containing swagger files to be added to the API bundle
+  - `-tl` / `--target-location`: Path to where the built API plugin artifact should be stored
+  - `-pv` / `--plugin-version`: Version of plugin to be created
+- API bundles are under `/resources/swagger_plugin_bundles`
 - The builder creates plugins which contain the following:
   - API client code bundled under appropriate paths derived from spec ID
   - `api_registry.py` and `domain_apis_list.json` files to help the core AladdinSDK read contents of the plugin
