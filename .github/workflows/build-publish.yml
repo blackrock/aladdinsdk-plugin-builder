@@ -5,9 +5,8 @@ name: Build and Publish - AladdinSDK Plugin Builder
 
 on:
   push:
-    branches: [ "*", "feat/*" ]
-  pull_request:
-    branches: [ "main", "develop" ]
+    tags:        
+      - '**'
 
 permissions:
   contents: read
@@ -64,7 +63,7 @@ jobs:
     - name: Build plugin packages
       run: |
         mkdir -p ${{ runner.temp }}/build_results/${{ matrix.plugin }}
-        python asdk_agraph_plugin_builder.py -tl ${{ runner.temp }}/build_results/${{ matrix.plugin }} -pv 0.0.1a1 -sb resources/swagger_plugin_bundles/${{ matrix.plugin }}
+        python asdk_agraph_plugin_builder.py -tl ${{ runner.temp }}/build_results/${{ matrix.plugin }} -pv ${{ github.ref_name }} -sb resources/swagger_plugin_bundles/${{ matrix.plugin }}
     - name: (TEMP) Upload build results
       uses: actions/upload-artifact@v4
       with:
