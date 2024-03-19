@@ -16,14 +16,6 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
-dynamic = ["dependencies"]
-
-[tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
-
-# [project.urls]
-# Homepage = "https://github.com/pypa/aladdinsdk"
-# Issues = "https://github.com/pypa/aladdinsdk/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]

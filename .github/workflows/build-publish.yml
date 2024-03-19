@@ -1,0 +1,77 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Build and Publish - AladdinSDK Plugin Builder
+
+on:
+  push:
+    tags:        
+      - '**'
+
+permissions:
+  contents: read
+
+jobs:
+  pre-build-setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-plugin-names-matrix.outputs.matrix }}
+    steps:
+    - name: Checkout project
+      uses: actions/checkout@v4
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 setuptools build
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics
+    - name: Create build plugin matrix
+      id: set-plugin-names-matrix
+      run: |
+        set_output_str_builder="{\"include\":["
+        for bundle_path in resources/swagger_plugin_bundles/*; do
+            if [ -d "$bundle_path" ]; then
+                bundle_suffix=$(basename $bundle_path)
+                set_output_str_builder+="{\"plugin\":\"$bundle_suffix\"},"
+            fi
+        done
+        set_output_str_builder+="]}"
+        echo "matrix=$set_output_str_builder" >> $GITHUB_OUTPUT
+  build:
+    needs: pre-build-setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.pre-build-setup.outputs.matrix)}}
+    name: Build and Publish asdk-plugin-${{ matrix.plugin }}
+    steps:
+    - name: Checkout project
+      uses: actions/checkout@v4
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.9"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 setuptools build
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Build plugin packages
+      run: |
+        mkdir -p ${{ runner.temp }}/build_results/${{ matrix.plugin }}
+        python asdk_agraph_plugin_builder.py -tl ${{ runner.temp }}/build_results/${{ matrix.plugin }} -pv ${{ github.ref_name }} -sb resources/swagger_plugin_bundles/${{ matrix.plugin }}
+    - name: (TEMP) Upload build results
+      uses: actions/upload-artifact@v4
+      with:
+        name: asdk-plugin-${{ matrix.plugin }}-artifact
+        path: ${{ runner.temp }}/build_results/${{ matrix.plugin }}
+      if: ${{ always() }}
+    # - name: Publish package
+    #   uses: pypa/gh-action-pypi-publish@release/v1
+    #   with:
+    #     packages-dir: ${{ runner.temp }}/build_results/${{ matrix.plugin }}
+    #     password: ${{ secrets.SIMPYL_TOKEN_PYPI }}
