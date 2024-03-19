@@ -20,7 +20,6 @@ if 'Windows' in platform_os:
     _ASDK_PLUGIN_BUILDER_REPO = pathlib.PureWindowsPath(os.getcwd()).as_posix()
 
 _openapi_generator_jar_filepath = os.path.join(_ASDK_PLUGIN_BUILDER_REPO, 'resources', 'openapi-generator-cli.jar')
-# _swagger_plugin_bundler_path = os.path.join(_ASDK_PLUGIN_BUILDER_REPO, 'resources', 'swagger_plugin_bundles')
 
 
 # Helper methods
@@ -55,12 +54,12 @@ def _run_command(command_array, message):
 
 
 def _update_asdk_plugin_codegen_section(plugin_module_name, api_name, api_version, api_module_path,
-                                        target_api_directory, target_domain_module_location):
+                                        target_api_directory, plugin_pkg_target_location):
     """
     Method to update ASDK plugin's codegen sections. Particularly code generated APIs list file.
     This method assumes rest of the codegen steps are complete and swagger json file is present in target api location
     """
-    domain_api_list_filepath = os.path.join(target_domain_module_location, plugin_module_name, "domain_apis_list.json")
+    domain_api_list_filepath = os.path.join(plugin_pkg_target_location, plugin_module_name, "domain_apis_list.json")
 
     # Load the API list file into a Python dictionary
     domain_api_list = []
@@ -126,7 +125,7 @@ def _generate_target_api_details_from_agraph_swagger_spec(plugin_module_name, ag
         return None, None, None
 
 
-def _onboard_api_using_swagger(plugin_module_name, path_to_agraph_openapi_spec_file, target_domain_module_location):
+def _onboard_api_using_swagger(plugin_module_name, path_to_agraph_openapi_spec_file, plugin_pkg_target_location):
     """Given a path to agraph swagger file, uses openapi-codegen to create a python client and copy code into target module
     - Creates a temporary python client project
     - Rsync and copies code, swagger and requirements files under given target location
@@ -135,7 +134,7 @@ def _onboard_api_using_swagger(plugin_module_name, path_to_agraph_openapi_spec_f
     Args:
         plugin_module_name (_type_): Final name of the plugin module being built
         path_to_agraph_openapi_spec_file (_type_): Absolute path to a agraph swagger file to be used for codegen
-        target_domain_module_location (_type_): Target location for API's domain
+        plugin_pkg_target_location (_type_): Target location for API's domain
 
     Returns:
         tuple: API Name-Version, Generated APIs target module
@@ -145,7 +144,7 @@ def _onboard_api_using_swagger(plugin_module_name, path_to_agraph_openapi_spec_f
         raise Exception("Insufficient API information in swagger files")
 
     # using api_module_path, generate target API location
-    target_api_directory = os.path.join(target_domain_module_location, *api_module_path.split('.'))
+    target_api_directory = os.path.join(plugin_pkg_target_location, *api_module_path.split('.'))
 
     print(f"Onboarding API - {api_name}-{api_ver}.")
     is_successful = True
@@ -175,22 +174,22 @@ def _onboard_api_using_swagger(plugin_module_name, path_to_agraph_openapi_spec_f
         is_successful = is_successful and _run_command(cp_command_swagger,
                                                        message=f"[API: {api_name}-{api_ver}] - Copy swagger file under target directory")
 
-        rsync_command = ["rsync", "-a", os.path.join(temp_dir, plugin_module_name), target_domain_module_location]
+        rsync_command = ["rsync", "-a", os.path.join(temp_dir, plugin_module_name), plugin_pkg_target_location]
         is_successful = is_successful and _run_command(rsync_command,
                                                        message=f"[API: {api_name}-{api_ver}] - Rsync python client code into sdk repo's "
                                                        "codegen package under newly created target directory")
 
         # Copy requirements.txt at domain root - assumption: all codegen clients share the same requirements
-        if not pathlib.Path(f"{target_domain_module_location}/requirements.txt").exists():
+        if not pathlib.Path(f"{plugin_pkg_target_location}/requirements.txt").exists():
             cp_command_requirements = ["cp", os.path.join(temp_dir, "requirements.txt"),
-                                       os.path.join(target_domain_module_location, "requirements.txt")]
+                                       os.path.join(plugin_pkg_target_location, "requirements.txt")]
             _run_command(cp_command_requirements,
                          message=f"[API: {api_name}-{api_ver}] - Copy requirements file under target directory")
 
     print(f"[API: {api_name}-{api_ver}] - Openapi codegen steps done. Proceeding with ASDK Plugin updates...")
     _update_asdk_plugin_codegen_section(plugin_module_name=plugin_module_name, api_name=api_name, api_version=api_ver,
                                         api_module_path=api_module_path, target_api_directory=target_api_directory,
-                                        target_domain_module_location=target_domain_module_location)
+                                        plugin_pkg_target_location=plugin_pkg_target_location)
 
     if is_successful:
         print(f"[API: {api_name}-{api_ver}] - API Onboarding complete. Result: 'success'")
@@ -199,7 +198,7 @@ def _onboard_api_using_swagger(plugin_module_name, path_to_agraph_openapi_spec_f
     return f"{api_name}-{api_ver}"
 
 
-def _build_plugin_with_swagger_files(plugin_module_name, api_swagger_files, target_domain_module_location):
+def _build_plugin_with_swagger_files(plugin_module_name, api_swagger_files, plugin_pkg_target_location):
     """Given paths to swagger files that need to be packaged into the plugin and the target location details, use openapi-generator
     to generate python clients in a temporary location, and copy python code modules into target location under the similar
     domain/segment/api structure. Return list of completed APIs and skipped APIs (with error/reasons for skipping)
@@ -207,7 +206,7 @@ def _build_plugin_with_swagger_files(plugin_module_name, api_swagger_files, targ
     Args:
         plugin_module_name (_type_): Final name of the plugin module being built
         api_swagger_files (_type_): List of swagger filepaths to be included in plugin
-        target_domain_module_location (_type_): Target location on build host to create package
+        plugin_pkg_target_location (_type_): Target location on build host to create package
 
     Returns:
         _type_: _description_
@@ -217,7 +216,7 @@ def _build_plugin_with_swagger_files(plugin_module_name, api_swagger_files, targ
 
     for api_swagger_file in api_swagger_files:
         try:
-            completed_api = _onboard_api_using_swagger(plugin_module_name, api_swagger_file, target_domain_module_location)
+            completed_api = _onboard_api_using_swagger(plugin_module_name, api_swagger_file, plugin_pkg_target_location)
             completed_apis_to_spec_map[completed_api] = api_swagger_file
         except Exception as e:
             skipped_api_specs_to_reason_map[api_swagger_file] = str(e)
@@ -225,33 +224,37 @@ def _build_plugin_with_swagger_files(plugin_module_name, api_swagger_files, targ
     return completed_apis_to_spec_map, skipped_api_specs_to_reason_map
 
 
-def create_plugin_content(api_swagger_files, plugin_name, target_domain_module_location, plugin_version):
-    """Generate plugin and return execution summary for this domain.
+def create_plugin_content(swagger_bundle_path, plugin_pkg_target_location, plugin_version):
+    """Generate plugin and print execution summary for this plugin.
     Add supplementary files for plugin artifacts:
         api_registry.py - To help AladdinSDK understand available APIs in this domain library
         setup.py - For plugin installation. Details in setup.py are updated for the plugin
 
     Args:
-        api_swagger_files (_type_): List of swagger filepaths to be included in plugin
-        plugin_name (_type_): Name of the AladdinSDK plugin library
-        target_domain_module_location (_type_): Target location on build host to create package
+        swagger_bundle_path (_type_): Path to directory containing swagger files for APIs to be included in plugin
+        plugin_pkg_target_location (_type_): Target location on build host to create package
         plugin_version (_type_): Version to be added for the plugin's pyproject.toml file
-
-    Returns:
-        _type_: execution summary map entires for this domain
     """
+    plugin_dir = os.path.basename(swagger_bundle_path)
+    plugin_name = _ASDK_PLUGIN_MODULE_PREFIX + plugin_dir
     print(f"\nBegin processing plugin: '{plugin_name}'...")
+
+    # Read file paths in swagger bundle directory
+    api_swagger_files = []
+    for plugin_dir_root, _, files in os.walk(swagger_bundle_path):
+        api_swagger_files = [os.path.join(plugin_dir_root, x) for x in files]
+
     _completed_apis_to_spec_map = {}
     _skipped_api_specs_to_reason_map = {}
 
     # generate domain plugin
     _completed_apis_to_spec_map, _skipped_api_specs_to_reason_map = _build_plugin_with_swagger_files(plugin_name, api_swagger_files,
-                                                                                                     target_domain_module_location)
+                                                                                                     plugin_pkg_target_location)
 
     # add supplementary files
     if len(_completed_apis_to_spec_map.keys()) > 0:
         cp_api_registry = ["cp", os.path.join(_ASDK_PLUGIN_BUILDER_REPO, "resources", "templates", "api_registry.py"),
-                           os.path.join(target_domain_module_location, plugin_name, "api_registry.py")]
+                           os.path.join(plugin_pkg_target_location, plugin_name, "api_registry.py")]
         _run_command(cp_api_registry, message=f"[Plugin: {plugin_name}] - Copy api_registry template under target module")
 
         with open(os.path.join(_ASDK_PLUGIN_BUILDER_REPO, "resources", "templates", "pyproject.toml"), "r") as pyproject_file:
@@ -259,11 +262,10 @@ def create_plugin_content(api_swagger_files, plugin_name, target_domain_module_l
             pyproject_file_content = pyproject_file_content.replace(r"{{pkg_version}}", plugin_version)
             pyproject_file_content = pyproject_file_content.replace(r"{{pkg_name}}", plugin_name)
 
-            with open(os.path.join(target_domain_module_location, "pyproject.toml"), "w") as target_pyproject_file:
+            with open(os.path.join(plugin_pkg_target_location, "pyproject.toml"), "w") as target_pyproject_file:
                 target_pyproject_file.write(pyproject_file_content)
 
-    print(f"Plugin: '{plugin_name}' complete with {len(_completed_apis_to_spec_map)} API codegen runs.")
-    return _completed_apis_to_spec_map, _skipped_api_specs_to_reason_map
+    print_run_summary(plugin_name, _completed_apis_to_spec_map, _skipped_api_specs_to_reason_map)
 
 
 def _summary_helper_split_skipped_map(_skipped_api_specs_to_reason_map):
@@ -278,46 +280,39 @@ def _summary_helper_split_skipped_map(_skipped_api_specs_to_reason_map):
     return _skipped_due_to_errors, _skipped_due_to_filtering
 
 
-def print_run_summary(summary_map):
+def print_run_summary(plugin_name, _completed_apis_to_spec_map, _skipped_api_specs_to_reason_map):
     print("\n==========================")
     print("FINAL SUMMARY")
     print("==========================")
-    total_completed_apis = 0
-    total_failed_apis = 0
-    for plugin_name in summary_map:
-        _completed_apis_to_spec_map = summary_map[plugin_name][0]
-        _skipped_api_specs_to_reason_map = summary_map[plugin_name][1]
-        _skipped_due_to_errors, _skipped_due_to_filtering = _summary_helper_split_skipped_map(_skipped_api_specs_to_reason_map)
-
-        if _verbose:
+    _skipped_due_to_errors, _skipped_due_to_filtering = _summary_helper_split_skipped_map(_skipped_api_specs_to_reason_map)
+    if _verbose:
+        print(f"Summary for plugin: '{plugin_name}' [completed: {len(_completed_apis_to_spec_map)}, "
+              f"skipped due to errors: {len(_skipped_due_to_errors)}, filtered out: {len(_skipped_due_to_filtering)}]")
+        if len(_completed_apis_to_spec_map) > 0:
+            print("\nCompleted APIs:")
+            [print(f"{x} - {_completed_apis_to_spec_map[x]}") for x in _completed_apis_to_spec_map]
+        if len(_skipped_due_to_errors) > 0:
+            print("\nSkipped due to errors APIs:")
+            [print(f"{x} - {_skipped_due_to_errors[x]}") for x in _skipped_due_to_errors]
+        print("------------------------------------")
+    else:
+        if len(_completed_apis_to_spec_map) > 0 or len(_skipped_due_to_errors) > 0:
             print(f"Summary for plugin: '{plugin_name}' [completed: {len(_completed_apis_to_spec_map)}, "
                   f"skipped due to errors: {len(_skipped_due_to_errors)}, filtered out: {len(_skipped_due_to_filtering)}]")
-            if len(_completed_apis_to_spec_map) > 0:
-                print("\nCompleted APIs:")
-                [print(f"{x} - {_completed_apis_to_spec_map[x]}") for x in _completed_apis_to_spec_map]
-            if len(_skipped_due_to_errors) > 0:
-                print("\nSkipped due to errors APIs:")
-                [print(f"{x} - {_skipped_due_to_errors[x]}") for x in _skipped_due_to_errors]
+            print(f"\nCompleted APIs: {[x for x in _completed_apis_to_spec_map]}")
             print("------------------------------------")
-        else:
-            if len(_completed_apis_to_spec_map) > 0 or len(_skipped_due_to_errors) > 0:
-                print(f"Summary for plugin: '{plugin_name}' [completed: {len(_completed_apis_to_spec_map)}, "
-                      f"skipped due to errors: {len(_skipped_due_to_errors)}, filtered out: {len(_skipped_due_to_filtering)}]")
-                print(f"\nCompleted APIs: {[x for x in _completed_apis_to_spec_map]}")
-                print("------------------------------------")
-        total_completed_apis += len(_completed_apis_to_spec_map)
-        total_failed_apis += len(_skipped_due_to_errors)
-    print(f"\n\nTotal - completed: {total_completed_apis}, failed: {total_failed_apis}")
+    print(f"\n\nTotal - completed: {len(_completed_apis_to_spec_map)}, failed: {len(_skipped_due_to_errors)}")
 
 
 # --------------------------------------------------- start ---------------------------------------------------
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="ASDK Codegen Util", description="Utility to generate python clients for aladdin-graph APIs")
-    parser.add_argument('-sb', '--swagger-bundle', help="Path to directory containing swagger files to be bundled in plugin")
+    parser.add_argument('-sb', '--swagger-bundle', help="Path to directory containing swagger files to be bundled in plugin. "
+                        "Path's basename is used to create plugin name as - asdk_plugin_<basename>")
     parser.add_argument('-tl', '--target-location', help="Target location where plugin libraries should be created")
     parser.add_argument('-pv', '--plugin-version', help="Tag version of domain plugin artifacts")
-    parser.add_argument('-oj', '--openapi-generator-cli-jar', help="(Optional) Path to openapi-generator-cli jar. If not provided, "
-                        f"script will attempt to get from {_OPENAPI_GENERATOR_JAR_DOWNLOAD_LINK}")
+    parser.add_argument('-oj', '--openapi-generator-cli-jar', help="(Optional) Path to openapi-generator-cli jar. "
+                        f"If not provided, script will attempt to get jar from {_OPENAPI_GENERATOR_JAR_DOWNLOAD_LINK}")
     parser.add_argument('-v', '--verbose', help="(Optional) More verbose summary", action='store_true')
 
     # Read input args
@@ -341,20 +336,5 @@ if __name__ == "__main__":
             _run_command(['wget', _OPENAPI_GENERATOR_JAR_DOWNLOAD_LINK, '-O', _openapi_generator_jar_filepath, '--no-check-certificate'],
                          message="Get openapi-generator jar")
 
-    # Read swagger directory structure to create APIs groupings for each plugin
-    _run_config_content = {}
-    plugin_dir = os.path.basename(_swagger_bundle_path)
-    plugin_name = _ASDK_PLUGIN_MODULE_PREFIX + plugin_dir
-    for plugin_dir_root, _, files in os.walk(_swagger_bundle_path):
-        complete_swagger_filepaths = [os.path.join(plugin_dir_root, x) for x in files]
-        _run_config_content[plugin_name] = complete_swagger_filepaths
-
-    # Run plugin builder logic for each key in run config map. Create method responds with completed/skipped APIs within the plugin build.
-    # Add these details to a summary map that will be printed out at the end of execution
-    summary_map = {}
-    for plugin_name, api_swagger_files in _run_config_content.items():
-        _completed_apis_to_spec_map, _skipped_api_specs_to_reason_map = create_plugin_content(api_swagger_files, plugin_name,
-                                                                                              _target_location, _plugin_version)
-        summary_map[plugin_name] = (_completed_apis_to_spec_map, _skipped_api_specs_to_reason_map)
-
-    print_run_summary(summary_map)
+    # Create plugin and print summary
+    create_plugin_content(_swagger_bundle_path, _target_location, _plugin_version)
