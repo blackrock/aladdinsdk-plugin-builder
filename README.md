@@ -1,7 +1,8 @@
 # AladdinSDK Plugin Builder
 
-This project builds API bundle plugins for AladdinSDK using swagger specifications. The valid Aladdin API specifications are to be included in the appropriate plugin directory [here](/resources/swagger_plugin_bundles/).
+This project builds API bundle plugins for [AladdinSDK](https://github.com/blackrock/aladdinsdk) using swagger specifications.
 
+Plugins are built based on specifications included in plugin directories [here](/resources/swagger_plugin_bundles/).
 
 ## Table of Contents
 
