@@ -1,3 +1,19 @@
+"""
+Copyright 2024 BlackRock, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+"""
+
 import os
 import subprocess
 import tempfile
@@ -27,25 +43,18 @@ def _run_command(command_array, message):
     """Given a command array, join with spaces and run.
 
     Args:
-        command_array (_type_): Sequence of program arguments or else a single string. By default, the program to execute is the first item in
+        command_array (list): Sequence of program arguments or else a single string. By default, the program to execute is the first item in
             args if args is a sequence. If args is a string, the interpretation is platform-dependent.
-        message (_type_): Message to log what the command achieves
+        message (str): Message to log what the command achieves
     """
-    result = None
-    platform_os = platform.platform()
-    if 'Windows' in platform_os:
-        if 'sudo' in command_array:
-            command_array.remove('sudo')
-        try:
-            result = subprocess.run(command_array, stdout=subprocess.PIPE)
-        except Exception:
-            print(f"subprocess.run failed failed trying subprocess.run for {' '.join(command_array)}")
-            os.system(" ".join(command_array))
-    else:
-        result = subprocess.run(command_array, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
     if _verbose:
         print(f"{message}: " + " ".join(command_array))
+
+    result = None
+    try:
+        result = subprocess.run(command_array, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        print(f"subprocess.run failed failed trying subprocess.run for {' '.join(command_array)}")
 
     if result is not None and hasattr(result, "returncode") and result.returncode == 0:
         return True
@@ -58,6 +67,14 @@ def _update_asdk_plugin_codegen_section(plugin_module_name, api_name, api_versio
     """
     Method to update ASDK plugin's codegen sections. Particularly code generated APIs list file.
     This method assumes rest of the codegen steps are complete and swagger json file is present in target api location
+
+    Args:
+        plugin_module_name (str): AladdinSDK Plugin module to add API to
+        api_name (str): API Name
+        api_version (str): API Version
+        api_module_path (str): API module path
+        target_api_directory (str): API client code location
+        plugin_pkg_target_location (str): Plugin package location
     """
     domain_api_list_filepath = os.path.join(plugin_pkg_target_location, plugin_module_name, "domain_apis_list.json")
 
@@ -91,13 +108,13 @@ def _update_asdk_plugin_codegen_section(plugin_module_name, api_name, api_versio
         print(f"[API: {api_name}-{api_version}] - Registry settings file updated.")
 
 
-def _generate_target_api_details_from_agraph_swagger_spec(plugin_module_name, agraph_swagger_file_path):
+def _fetch_api_details_from_agraph_swagger(plugin_module_name, agraph_swagger_file_path):
     """Given path to an Aladdin Graph swagger file, read API name, version and generate module path from 'info.x-aladdin-spec-id'.
     Assumption here is x-aladdin-spec-id is of the format 'agraph.<domain>.<segment>.<api>.<VERSION>.<API_NAME>'
 
     Args:
-        plugin_module_name (String): Target plugin module name
-        agraph_swagger_file_path (FileDescriptorOrPath): Path to swagger file for API to onboard
+        plugin_module_name (str): Target plugin module name
+        agraph_swagger_file_path (str): Path to swagger file for API to onboard
 
     Raises:
         Exception: _description_
@@ -125,21 +142,21 @@ def _generate_target_api_details_from_agraph_swagger_spec(plugin_module_name, ag
         return None, None, None
 
 
-def _onboard_api_using_swagger(plugin_module_name, path_to_agraph_openapi_spec_file, plugin_pkg_target_location):
+def _generate_api_client_using_swagger(plugin_module_name, path_to_agraph_openapi_spec_file, plugin_pkg_target_location):
     """Given a path to agraph swagger file, uses openapi-codegen to create a python client and copy code into target module
     - Creates a temporary python client project
     - Rsync and copies code, swagger and requirements files under given target location
     - Updates api list configuration file
 
     Args:
-        plugin_module_name (_type_): Final name of the plugin module being built
-        path_to_agraph_openapi_spec_file (_type_): Absolute path to a agraph swagger file to be used for codegen
-        plugin_pkg_target_location (_type_): Target location for API's domain
+        plugin_module_name (str): Final name of the plugin module being built
+        path_to_agraph_openapi_spec_file (str): Absolute path to a agraph swagger file to be used for codegen
+        plugin_pkg_target_location (str): Target location for API's domain
 
     Returns:
         tuple: API Name-Version, Generated APIs target module
     """
-    api_name, api_ver, api_module_path = _generate_target_api_details_from_agraph_swagger_spec(plugin_module_name, path_to_agraph_openapi_spec_file)
+    api_name, api_ver, api_module_path = _fetch_api_details_from_agraph_swagger(plugin_module_name, path_to_agraph_openapi_spec_file)
     if api_name is None or api_ver is None or api_module_path is None:
         raise Exception("Insufficient API information in swagger files")
 
@@ -156,6 +173,7 @@ def _onboard_api_using_swagger(plugin_module_name, path_to_agraph_openapi_spec_f
             temp_dir = pathlib.PureWindowsPath(temp_dir).as_posix()
             print(f'[API: {api_name}-{api_ver}] - windows updated temporary directory', temp_dir)
 
+        # code generation step
         python_codegen_command = ["java", "-jar", _openapi_generator_jar_filepath, "generate",
                                   "-i", path_to_agraph_openapi_spec_file,
                                   "-g", "python-nextgen",
@@ -165,18 +183,21 @@ def _onboard_api_using_swagger(plugin_module_name, path_to_agraph_openapi_spec_f
         is_successful = is_successful and _run_command(python_codegen_command,
                                                        message=f"[API: {api_name}-{api_ver}] - Generate python client code using swagger spec")
 
+        # remove any existing files from target logcation to avoid duplication errors
         is_successful = is_successful and _run_command(["rm", "-rf", target_api_directory],
                                                        message=f"[API: {api_name}-{api_ver}] - Remove existing codegen dir if present")
         is_successful = is_successful and _run_command(["mkdir", "-pv", target_api_directory],
                                                        message=f"[API: {api_name}-{api_ver}] - Create target directory for codegen")
 
+        # copy swagger file to target location
         cp_command_swagger = ["cp", path_to_agraph_openapi_spec_file, os.path.join(target_api_directory, "swagger.json")]
         is_successful = is_successful and _run_command(cp_command_swagger,
                                                        message=f"[API: {api_name}-{api_ver}] - Copy swagger file under target directory")
 
+        # rsync python client code to target location
         rsync_command = ["rsync", "-a", os.path.join(temp_dir, plugin_module_name), plugin_pkg_target_location]
         is_successful = is_successful and _run_command(rsync_command,
-                                                       message=f"[API: {api_name}-{api_ver}] - Rsync python client code into sdk repo's "
+                                                       message=f"[API: {api_name}-{api_ver}] - Rsync python client code into sdk plugin "
                                                        "codegen package under newly created target directory")
 
         # Copy requirements.txt at domain root - assumption: all codegen clients share the same requirements
@@ -198,33 +219,7 @@ def _onboard_api_using_swagger(plugin_module_name, path_to_agraph_openapi_spec_f
     return f"{api_name}-{api_ver}"
 
 
-def _build_plugin_with_swagger_files(plugin_module_name, api_swagger_files, plugin_pkg_target_location):
-    """Given paths to swagger files that need to be packaged into the plugin and the target location details, use openapi-generator
-    to generate python clients in a temporary location, and copy python code modules into target location under the similar
-    domain/segment/api structure. Return list of completed APIs and skipped APIs (with error/reasons for skipping)
-
-    Args:
-        plugin_module_name (_type_): Final name of the plugin module being built
-        api_swagger_files (_type_): List of swagger filepaths to be included in plugin
-        plugin_pkg_target_location (_type_): Target location on build host to create package
-
-    Returns:
-        _type_: _description_
-    """
-    completed_apis_to_spec_map = {}
-    skipped_api_specs_to_reason_map = {}
-
-    for api_swagger_file in api_swagger_files:
-        try:
-            completed_api = _onboard_api_using_swagger(plugin_module_name, api_swagger_file, plugin_pkg_target_location)
-            completed_apis_to_spec_map[completed_api] = api_swagger_file
-        except Exception as e:
-            skipped_api_specs_to_reason_map[api_swagger_file] = str(e)
-
-    return completed_apis_to_spec_map, skipped_api_specs_to_reason_map
-
-
-def create_plugin_content(swagger_bundle_path, plugin_pkg_target_location, plugin_version):
+def _create_plugin_content(swagger_bundle_path, plugin_pkg_target_location, plugin_version):
     """Generate plugin and print execution summary for this plugin.
     Add supplementary files for plugin artifacts:
         api_registry.py - To help AladdinSDK understand available APIs in this domain library
@@ -235,73 +230,58 @@ def create_plugin_content(swagger_bundle_path, plugin_pkg_target_location, plugi
         plugin_pkg_target_location (_type_): Target location on build host to create package
         plugin_version (_type_): Version to be added for the plugin's pyproject.toml file
     """
-    plugin_dir = os.path.basename(swagger_bundle_path)
-    plugin_name = _ASDK_PLUGIN_MODULE_PREFIX + plugin_dir
-    print(f"\nBegin processing plugin: '{plugin_name}'...")
+    plugin_dir_name = os.path.basename(swagger_bundle_path)
+    plugin_module_name = _ASDK_PLUGIN_MODULE_PREFIX + plugin_dir_name
+    print(f"\nBegin processing plugin: '{plugin_module_name}'...")
+
+    completed_apis_to_spec_map = {}
+    skipped_api_specs_to_reason_map = {}
 
     # Read file paths in swagger bundle directory
     api_swagger_files = []
     for plugin_dir_root, _, files in os.walk(swagger_bundle_path):
         api_swagger_files = [os.path.join(plugin_dir_root, x) for x in files]
 
-    _completed_apis_to_spec_map = {}
-    _skipped_api_specs_to_reason_map = {}
+    # For each API swagger file, generate python client and copy codegen into target location
+    for api_swagger_file in api_swagger_files:
+        try:
+            completed_api = _generate_api_client_using_swagger(plugin_module_name, api_swagger_file, plugin_pkg_target_location)
+            completed_apis_to_spec_map[completed_api] = api_swagger_file
+        except Exception as e:
+            skipped_api_specs_to_reason_map[api_swagger_file] = str(e)
 
-    # generate domain plugin
-    _completed_apis_to_spec_map, _skipped_api_specs_to_reason_map = _build_plugin_with_swagger_files(plugin_name, api_swagger_files,
-                                                                                                     plugin_pkg_target_location)
-
-    # add supplementary files
-    if len(_completed_apis_to_spec_map.keys()) > 0:
+    # Add supplementary package files to plugin
+    if len(completed_apis_to_spec_map.keys()) > 0:
         cp_api_registry = ["cp", os.path.join(_ASDK_PLUGIN_BUILDER_REPO, "resources", "templates", "api_registry.py"),
-                           os.path.join(plugin_pkg_target_location, plugin_name, "api_registry.py")]
-        _run_command(cp_api_registry, message=f"[Plugin: {plugin_name}] - Copy api_registry template under target module")
+                           os.path.join(plugin_pkg_target_location, plugin_module_name, "api_registry.py")]
+        _run_command(cp_api_registry, message=f"[Plugin: {plugin_module_name}] - Copy api_registry template under target module")
 
         with open(os.path.join(_ASDK_PLUGIN_BUILDER_REPO, "resources", "templates", "pyproject.toml"), "r") as pyproject_file:
             pyproject_file_content = pyproject_file.read()
             pyproject_file_content = pyproject_file_content.replace(r"{{pkg_version}}", plugin_version)
-            pyproject_file_content = pyproject_file_content.replace(r"{{pkg_name}}", plugin_name)
+            pyproject_file_content = pyproject_file_content.replace(r"{{pkg_name}}", plugin_module_name)
 
             with open(os.path.join(plugin_pkg_target_location, "pyproject.toml"), "w") as target_pyproject_file:
                 target_pyproject_file.write(pyproject_file_content)
 
-    print_run_summary(plugin_name, _completed_apis_to_spec_map, _skipped_api_specs_to_reason_map)
+    _print_run_summary(plugin_module_name, completed_apis_to_spec_map, skipped_api_specs_to_reason_map)
 
 
-def _summary_helper_split_skipped_map(_skipped_api_specs_to_reason_map):
-    _skipped_due_to_errors = {}
-    _skipped_due_to_filtering = {}
-    for x in _skipped_api_specs_to_reason_map:
-        skip_note = _skipped_api_specs_to_reason_map[x]
-        if skip_note == "Filtered out":
-            _skipped_due_to_filtering[x] = skip_note
-        else:
-            _skipped_due_to_errors[x] = skip_note
-    return _skipped_due_to_errors, _skipped_due_to_filtering
-
-
-def print_run_summary(plugin_name, _completed_apis_to_spec_map, _skipped_api_specs_to_reason_map):
+def _print_run_summary(plugin_name, _completed_apis_to_spec_map, _skipped_api_specs_to_reason_map):
     print("\n==========================")
     print("FINAL SUMMARY")
     print("==========================")
-    _skipped_due_to_errors, _skipped_due_to_filtering = _summary_helper_split_skipped_map(_skipped_api_specs_to_reason_map)
+    print(f"Summary for plugin: '{plugin_name}' [completed: {len(_completed_apis_to_spec_map)}, "
+          f"skipped due to errors: {len(_skipped_api_specs_to_reason_map)}]")
     if _verbose:
-        print(f"Summary for plugin: '{plugin_name}' [completed: {len(_completed_apis_to_spec_map)}, "
-              f"skipped due to errors: {len(_skipped_due_to_errors)}, filtered out: {len(_skipped_due_to_filtering)}]")
         if len(_completed_apis_to_spec_map) > 0:
             print("\nCompleted APIs:")
             [print(f"{x} - {_completed_apis_to_spec_map[x]}") for x in _completed_apis_to_spec_map]
-        if len(_skipped_due_to_errors) > 0:
+        if len(_skipped_api_specs_to_reason_map) > 0:
             print("\nSkipped due to errors APIs:")
-            [print(f"{x} - {_skipped_due_to_errors[x]}") for x in _skipped_due_to_errors]
+            [print(f"{x} - {_skipped_api_specs_to_reason_map[x]}") for x in _skipped_api_specs_to_reason_map]
         print("------------------------------------")
-    else:
-        if len(_completed_apis_to_spec_map) > 0 or len(_skipped_due_to_errors) > 0:
-            print(f"Summary for plugin: '{plugin_name}' [completed: {len(_completed_apis_to_spec_map)}, "
-                  f"skipped due to errors: {len(_skipped_due_to_errors)}, filtered out: {len(_skipped_due_to_filtering)}]")
-            print(f"\nCompleted APIs: {[x for x in _completed_apis_to_spec_map]}")
-            print("------------------------------------")
-    print(f"\n\nTotal - completed: {len(_completed_apis_to_spec_map)}, failed: {len(_skipped_due_to_errors)}")
+        print(f"\n\nTotal - completed: {len(_completed_apis_to_spec_map)}, failed: {len(_skipped_api_specs_to_reason_map)}")
 
 
 # --------------------------------------------------- start ---------------------------------------------------
@@ -337,4 +317,4 @@ if __name__ == "__main__":
                          message="Get openapi-generator jar")
 
     # Create plugin and print summary
-    create_plugin_content(_swagger_bundle_path, _target_location, _plugin_version)
+    _create_plugin_content(_swagger_bundle_path, _target_location, _plugin_version)
