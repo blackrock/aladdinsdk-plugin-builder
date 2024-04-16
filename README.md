@@ -20,7 +20,7 @@ For each plugin directory, an AladdinSDK plugin will be published which contains
 _Pre-requisite: Install AladdinSDK using `pip install aladdinsdk`_
 
 AladdinSDK's functional capabilities can be extended as needed using 'plugins'. These are essentially API bundles created at domain level. </br>
-The external facing APIs are bundled as follows:
+The APIs are bundled as follows:
 
 ### asdk_plugin_accounting
 - Command to install: `pip install asdk_plugin_accounting`
