@@ -66,6 +66,9 @@ jobs:
         python asdk_agraph_plugin_builder.py -tl ${{ runner.temp }}/build_results/${{ matrix.plugin }} -pv ${{ github.ref_name }} -sb resources/swagger_plugin_bundles/${{ matrix.plugin }}
         cd ${{ runner.temp }}/build_results/${{ matrix.plugin }}
         python -m build
+        echo "Check build contents"
+        pwd
+        ls
     - name: (TEMP) Upload build results
       uses: actions/upload-artifact@v4
       with:
