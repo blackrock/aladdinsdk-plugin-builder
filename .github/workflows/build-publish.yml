@@ -80,5 +80,5 @@ jobs:
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        packages-dir: ${{ runner.temp }}/build_results/${{ matrix.plugin }}/dist/
+        packages-dir: ${{ runner.temp }}/build_results/${{ matrix.plugin }}/dist/*.whl
         password: ${{ secrets.TEST_VNAIK_PYPI }}
