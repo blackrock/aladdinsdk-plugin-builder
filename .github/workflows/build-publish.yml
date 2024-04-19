@@ -75,10 +75,24 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: asdk-plugin-${{ matrix.plugin }}-artifact
-        path: ${{ runner.temp }}/build_results/${{ matrix.plugin }}/dist/*whl
+        path: ${{ runner.temp }}/build_results/${{ matrix.plugin }}/dist/*.whl
       if: ${{ always() }}
-    - name: Publish package
+    # - name: Publish package
+    #   uses: pypa/gh-action-pypi-publish@release/v1
+    #   with:
+    #     packages-dir: ${{ runner.temp }}/build_results/${{ matrix.plugin }}/dist/*.whl
+    #     password: ${{ secrets.TEST_VNAIK_PYPI }}
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist/
+    - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        packages-dir: ${{ runner.temp }}/build_results/${{ matrix.plugin }}/dist/*.whl
+        # packages-dir: ${{ runner.temp }}/build_results/${{ matrix.plugin }}/dist/*.whl
         password: ${{ secrets.TEST_VNAIK_PYPI }}
