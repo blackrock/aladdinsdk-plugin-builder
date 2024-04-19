@@ -64,14 +64,16 @@ jobs:
       run: |
         mkdir -p ${{ runner.temp }}/build_results/${{ matrix.plugin }}
         python asdk_agraph_plugin_builder.py -tl ${{ runner.temp }}/build_results/${{ matrix.plugin }} -pv ${{ github.ref_name }} -sb resources/swagger_plugin_bundles/${{ matrix.plugin }}
+        cd ${{ runner.temp }}/build_results/${{ matrix.plugin }}
+        python -m build
     - name: (TEMP) Upload build results
       uses: actions/upload-artifact@v4
       with:
         name: asdk-plugin-${{ matrix.plugin }}-artifact
-        path: ${{ runner.temp }}/build_results/${{ matrix.plugin }}
+        path: ${{ runner.temp }}/build_results/${{ matrix.plugin }}/dist/*whl
       if: ${{ always() }}
-    - name: Publish package
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        packages-dir: ${{ runner.temp }}/build_results/${{ matrix.plugin }}
-        password: ${{ secrets.TEST_VNAIK_PYPI }}
+    # - name: Publish package
+    #   uses: pypa/gh-action-pypi-publish@release/v1
+    #   with:
+    #     packages-dir: ${{ runner.temp }}/build_results/${{ matrix.plugin }}
+    #     password: ${{ secrets.TEST_VNAIK_PYPI }}
