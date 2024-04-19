@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{fromJson(needs.pre-build-setup.outputs.matrix)}}
-    name: Build and Publish asdk-plugin-${{ matrix.plugin }}
+    name: Build asdk-plugin-${{ matrix.plugin }}
     steps:
     - name: Checkout project
       uses: actions/checkout@v4
@@ -83,13 +83,18 @@ jobs:
     #     packages-dir: ${{ runner.temp }}/build_results/${{ matrix.plugin }}/dist/*.whl
     #     password: ${{ secrets.TEST_VNAIK_PYPI }}
   publish:
-    needs: build
+    needs:
+      - pre-build-setup
+      - build
     runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.pre-build-setup.outputs.matrix)}}
+    name: Publish asdk-plugin-${{ matrix.plugin }}
     steps:
     - name: Download all the dists
       uses: actions/download-artifact@v4
       with:
-        name: python-package-distributions
+        name: asdk-plugin-${{ matrix.plugin }}-artifact
         path: dist/
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
