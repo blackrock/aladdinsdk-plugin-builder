@@ -70,8 +70,8 @@ jobs:
         name: asdk-plugin-${{ matrix.plugin }}-artifact
         path: ${{ runner.temp }}/build_results/${{ matrix.plugin }}
       if: ${{ always() }}
-    # - name: Publish package
-    #   uses: pypa/gh-action-pypi-publish@release/v1
-    #   with:
-    #     packages-dir: ${{ runner.temp }}/build_results/${{ matrix.plugin }}
-    #     password: ${{ secrets.SIMPYL_TOKEN_PYPI }}
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages-dir: ${{ runner.temp }}/build_results/${{ matrix.plugin }}
+        password: ${{ secrets.TEST_VNAIK_PYPI }}
