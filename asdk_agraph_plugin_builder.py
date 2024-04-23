@@ -219,6 +219,27 @@ def _generate_api_client_using_swagger(plugin_module_name, path_to_agraph_openap
     return f"{api_name}-{api_ver}"
 
 
+def _create_plugin_readme(plugin_module_name, plugin_pkg_target_location):
+    """Create README file for plugin to help users understand the plugin and how to use it
+
+    Args:
+        plugin_module_name (str): Plugin module name
+        plugin_pkg_target_location (str): Target location for plugin package
+    """
+    domain_api_list_filepath = os.path.join(plugin_pkg_target_location, plugin_module_name, "domain_apis_list.json")
+    with open(domain_api_list_filepath, 'r') as api_list_file:
+        api_list_json_content = json.loads(api_list_file.read())
+
+    readme_content = f"# AladdinSDK API Plugin - {plugin_module_name}\n\nTo install this plugin, run the following command:\n\n`pip install {plugin_module_name}`\n\n"
+
+    readme_content += "## APIs bundled in this plugin:\n"
+    for entry in api_list_json_content:
+        readme_content += f"\n- {entry['api_name']} - {entry['api_version']}\n"
+
+    with open(os.path.join(plugin_pkg_target_location, "README.md"), "w") as readme_file:
+        readme_file.write(readme_content)
+
+
 def _create_plugin_content(swagger_bundle_path, plugin_pkg_target_location, plugin_version):
     """Generate plugin and print execution summary for this plugin.
     Add supplementary files for plugin artifacts:
@@ -252,10 +273,15 @@ def _create_plugin_content(swagger_bundle_path, plugin_pkg_target_location, plug
 
     # Add supplementary package files to plugin
     if len(completed_apis_to_spec_map.keys()) > 0:
+        # README.md
+        _create_plugin_readme(plugin_module_name, plugin_pkg_target_location)
+
+        # api_registry to help core SDK read this plugin
         cp_api_registry = ["cp", os.path.join(_ASDK_PLUGIN_BUILDER_REPO, "resources", "templates", "api_registry.py"),
                            os.path.join(plugin_pkg_target_location, plugin_module_name, "api_registry.py")]
         _run_command(cp_api_registry, message=f"[Plugin: {plugin_module_name}] - Copy api_registry template under target module")
 
+        # pyproject.toml
         with open(os.path.join(_ASDK_PLUGIN_BUILDER_REPO, "resources", "templates", "pyproject.toml"), "r") as pyproject_file:
             pyproject_file_content = pyproject_file.read()
             pyproject_file_content = pyproject_file_content.replace(r"{{pkg_version}}", plugin_version)
