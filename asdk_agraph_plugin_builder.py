@@ -230,7 +230,9 @@ def _create_plugin_readme(plugin_module_name, plugin_pkg_target_location):
     with open(domain_api_list_filepath, 'r') as api_list_file:
         api_list_json_content = json.loads(api_list_file.read())
 
-    readme_content = f"# AladdinSDK API Plugin - {plugin_module_name}\n\nTo install this plugin, run the following command:\n\n`pip install {plugin_module_name}`\n\n"
+    readme_content = f"# AladdinSDK API Plugin - {plugin_module_name}\n\n" \
+        f"**Pre-requisite:** Install [AladdinSDK](https://pypi.org/project/aladdinsdk/) using `pip install aladdinsdk`\n\n" \
+        f"To install this plugin, run the following command:\n\n `pip install {plugin_module_name}`\n\n"
 
     readme_content += "## APIs bundled in this plugin:\n"
     for entry in api_list_json_content:
