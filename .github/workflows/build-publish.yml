@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{fromJson(needs.pre-build-setup.outputs.matrix)}}
-    name: Build and Publish asdk-plugin-${{ matrix.plugin }}
+    name: Build asdk-plugin-${{ matrix.plugin }}
     steps:
     - name: Checkout project
       uses: actions/checkout@v4
@@ -64,14 +64,34 @@ jobs:
       run: |
         mkdir -p ${{ runner.temp }}/build_results/${{ matrix.plugin }}
         python asdk_agraph_plugin_builder.py -tl ${{ runner.temp }}/build_results/${{ matrix.plugin }} -pv ${{ github.ref_name }} -sb resources/swagger_plugin_bundles/${{ matrix.plugin }}
+        cd ${{ runner.temp }}/build_results/${{ matrix.plugin }}
+        python -m build
+        echo "Check build contents"
+        pwd
+        ls
+        echo "Check build dist contents"
+        ls ${{ runner.temp }}/build_results/${{ matrix.plugin }}/dist/
     - name: (TEMP) Upload build results
       uses: actions/upload-artifact@v4
       with:
         name: asdk-plugin-${{ matrix.plugin }}-artifact
-        path: ${{ runner.temp }}/build_results/${{ matrix.plugin }}
+        path: ${{ runner.temp }}/build_results/${{ matrix.plugin }}/dist/*.whl
       if: ${{ always() }}
-    # - name: Publish package
-    #   uses: pypa/gh-action-pypi-publish@release/v1
-    #   with:
-    #     packages-dir: ${{ runner.temp }}/build_results/${{ matrix.plugin }}
-    #     password: ${{ secrets.SIMPYL_TOKEN_PYPI }}
+  publish:
+    needs:
+      - pre-build-setup
+      - build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.pre-build-setup.outputs.matrix)}}
+    name: Publish asdk-plugin-${{ matrix.plugin }}
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v4
+      with:
+        name: asdk-plugin-${{ matrix.plugin }}-artifact
+        path: dist/
+    - name: Publish distribution 📦 to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.BLK_PYPI_ALADDINSDK }}
