@@ -44,7 +44,6 @@ The APIs are bundled as follows:
   | [RiskRuleAPI v1](resources/swagger_plugin_bundles/analytics/analytics_oversight_governance_v1_risk_rule_api.swagger.json) |
   | [RiskTaskAPI v1](resources/swagger_plugin_bundles/analytics/analytics_oversight_governance_v1_risk_task_api.swagger.json) |
   | [RiskWorkflowAPI v1](resources/swagger_plugin_bundles/analytics/analytics_oversight_governance_v1_risk_workflow_api.swagger.json) |
-  | [SecurityReturnsAPI v1](resources/swagger_plugin_bundles/analytics/analytics_security_analytics_returns_v1_security_return_api.swagger.json) |
 
 ### asdk_plugin_clients
 - Command to install: `pip install asdk_plugin_clients`
@@ -65,7 +64,6 @@ The APIs are bundled as follows:
 - Command to install: `pip install asdk_plugin_data`
   | Included APIs |
   |:-------------------------------------------------|
-  | [PricingAPI v2](resources/swagger_plugin_bundles/data/data_market_data_price_v2_price_api.swagger.json) |
   | [SecurityCreationAPI v1](resources/swagger_plugin_bundles/data/data_reference_data_asset_asset_creation_v1_security_creation_api.swagger.json) |
 
 ### asdk_plugin_investment_operations
