@@ -128,7 +128,9 @@ The APIs are bundled as follows:
 - Command to install: `pip install asdk_plugin_trading`
   | Included APIs |
   |:-------------------------------------------------|
-  [OrderAPI v1](resources/swagger_plugin_bundles/trading/trading_order_management_order_v1_order_api.swagger.json) 
+  | [OrderAPI v1](resources/swagger_plugin_bundles/trading/trading_order_management_order_v1_order_api.swagger.json) |
+  | [TradeAPI v2](resources/swagger_plugin_bundles/trading/trading_trade_processing_trade_v2_trade_api.swagger.json) | 
+
 
 ## Usage
 
