@@ -75,6 +75,7 @@ The APIs are bundled as follows:
   | [CouponResetAPI v1](resources/swagger_plugin_bundles/investment_operations/investment_operations_asset_lifecycle_coupon_reset_v1_coupon_reset_api.swagger.json) |
   | [PrincipalInterestFactorAPI v1](resources/swagger_plugin_bundles/investment_operations/investment_operations_asset_lifecycle_principal_interest_factor_v1_principal_interest_factor_api.swagger.json) |
   | [MiscellaneousCashflowAPI v1](resources/swagger_plugin_bundles/investment_operations/investment_operations_cash_flows_miscellaneous_cashflow_v1_miscellaneous_cashflow_api.swagger.json) |
+  | [CollateralStatementAPI v1](resources/swagger_plugin_bundles/investment_operations/investment_operations_collateral_management_collateral_statement_v1_collateral_statement_api.swagger.json) |
   | [AccountInfoAPI v1](resources/swagger_plugin_bundles/investment_operations/investment_operations_reference_data_account_info_v1_account_info_api.swagger.json) |
   | [AuditAPI v1](resources/swagger_plugin_bundles/investment_operations/investment_operations_reference_data_broker_v1_audit_api.swagger.json) |
   | [BrokerAPI v1](resources/swagger_plugin_bundles/investment_operations/investment_operations_reference_data_broker_v1_broker_api.swagger.json) |
@@ -112,16 +113,15 @@ The APIs are bundled as follows:
   |:-------------------------------------------------|
   | [PortfolioGroupAPI v1](resources/swagger_plugin_bundles/portfolio/portfolio_configuration_portfolio_group_v1_portfolio_group_api.swagger.json) |
   | [RestrictedAssetAPI v1](resources/swagger_plugin_bundles/portfolio/portfolio_configuration_restricted_asset_v1_restricted_asset_api.swagger.json) |
+  | [PortfolioToolkitAPI v1](resources/swagger_plugin_bundles/portfolio/portfolio_setup_portfolio_toolkit_v1_portfolio_toolkit_api.swagger.json) |
 
 ### asdk_plugin_portfolio_management
 - Command to install: `pip install asdk_plugin_portfolio_management`
   | Included APIs |
   |:-------------------------------------------------|
   | [CashLadderAPI v2](resources/swagger_plugin_bundles/portfolio_management/portfolio_management_cash_cash_ladder_v2_cash_ladder_api.swagger.json) |
-  | [PositionsAPI v2](resources/swagger_plugin_bundles/portfolio_management/portfolio_management_positions_positions_v2_positions_api.swagger.json) |
   | [CIDReaderAPI v1](resources/swagger_plugin_bundles/portfolio_management/portfolio_management_setup_cids_v1_cids_reader_api.swagger.json) |
   | [CIDWriterAPI v1](resources/swagger_plugin_bundles/portfolio_management/portfolio_management_setup_cids_v1_cids_writer_api.swagger.json) |
-  | [InvestmentTargetAPI v1](resources/swagger_plugin_bundles/portfolio_management/portfolio_management_target_investment_target_v1_investment_target_api.swagger.json) |
   | [StrategyAPI v1](resources/swagger_plugin_bundles/portfolio_management/portfolio_management_target_strategy_v1_strategy_api.swagger.json) |
 
 ### asdk_plugin_trading

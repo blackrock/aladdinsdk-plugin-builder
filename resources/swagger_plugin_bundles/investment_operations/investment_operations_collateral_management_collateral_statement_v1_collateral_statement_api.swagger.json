@@ -1,0 +1,1955 @@
+{
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "schemes": [
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Collateral statements in Aladdin are generated on a daily basis by Aladdin's margin calculators referencing legal agreement set up in DECO, security details, pricing and position data. The generated statements are viewable in the DECO tool. This API allows for retrieval and filtering of collateral statement and collateral detail data (exposure, collateral held, collateral pledged), using a number of criteria including Statement ID, Broker, Portfolio, Statement Type, Agreement Type and more",
+        "title": "Collateral Statements",
+        "version": "1.0.0",
+        "x-aladdin-api-id": "agraph.investment_operations.collateral_management.collateral_statement.CollateralStatementAPI",
+        "x-aladdin-api-stability": "beta",
+        "x-aladdin-spec-id": "agraph.investment_operations.collateral_management.collateral_statement.v1.CollateralStatementAPI"
+    },
+    "basePath": "/api/investment-operations/collateral-management/collateral-statement/v1/",
+    "paths": {
+        "/collateralStatement/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "APIKeyHeader": [],
+                        "OAuth2AccessCode": [
+                            "investment_operations.collateral_management.collateral_statement.v1.CollateralStatement:read"
+                        ]
+                    },
+                    {
+                        "APIKeyHeader": [],
+                        "OAuth2ClientCredentials": [
+                            "investment_operations.collateral_management.collateral_statement.v1.CollateralStatement:read"
+                        ]
+                    },
+                    {
+                        "APIKeyHeader": [],
+                        "ClientKeyHeader": []
+                    },
+                    {
+                        "APIKeyHeader": [],
+                        "basicAuth": []
+                    }
+                ],
+                "description": "Retrieves a unique collateral statement and detail record for a single statement ID.",
+                "summary": "Extracts a single collateral statement",
+                "operationId": "CollateralStatementAPI_GetCollateralStatement",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "UUID",
+                        "description": "A unique identifier for this request.",
+                        "name": "VND.com.blackrock.Request-ID",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Timestamp assigned to this request at origin, in \"HTTP-date\" format as defined by RFC 7231.",
+                        "name": "VND.com.blackrock.Origin-Timestamp",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Statement id to search for.",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/v1CollateralStatement"
+                        }
+                    },
+                    "400": {
+                        "description": "Aladdin® will not process the request due to an apparent client error.",
+                        "schema": {
+                            "description": "Defines an error that occurred.",
+                            "type": "object",
+                            "required": [
+                                "code",
+                                "message"
+                            ],
+                            "properties": {
+                                "code": {
+                                    "description": "A short mnemonic reference code for the error.",
+                                    "type": "string",
+                                    "maxLength": 40
+                                },
+                                "message": {
+                                    "description": "A human readable description of the error.",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "VND.com.blackrock.Request-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "The unique identifier assigned by the client to the request that originated this response."
+                            },
+                            "VND.com.blackrock.Response-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "A Unique Identifier for this response."
+                            },
+                            "VND.com.blackrock.Response-Timestamp": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Timestamp assigned to this response, in \"HTTP-date\" format as defined by RFC 7231."
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Aladdin® will not process the request as the necessary credentials were not provided or were invalid.",
+                        "schema": {
+                            "description": "Defines an error that occurred.",
+                            "type": "object",
+                            "required": [
+                                "code",
+                                "message"
+                            ],
+                            "properties": {
+                                "code": {
+                                    "description": "A short mnemonic reference code for the error.",
+                                    "type": "string",
+                                    "maxLength": 40
+                                },
+                                "message": {
+                                    "description": "A human readable description of the error.",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "VND.com.blackrock.Request-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "The unique identifier assigned by the client to the request that originated this response."
+                            },
+                            "VND.com.blackrock.Response-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "A Unique Identifier for this response."
+                            },
+                            "VND.com.blackrock.Response-Timestamp": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Timestamp assigned to this response, in \"HTTP-date\" format as defined by RFC 7231."
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Aladdin® understood the request but is refusing to authorize it.",
+                        "schema": {
+                            "description": "Defines an error that occurred.",
+                            "type": "object",
+                            "required": [
+                                "code",
+                                "message"
+                            ],
+                            "properties": {
+                                "code": {
+                                    "description": "A short mnemonic reference code for the error.",
+                                    "type": "string",
+                                    "maxLength": 40
+                                },
+                                "message": {
+                                    "description": "A human readable description of the error.",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "VND.com.blackrock.Request-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "The unique identifier assigned by the client to the request that originated this response."
+                            },
+                            "VND.com.blackrock.Response-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "A Unique Identifier for this response."
+                            },
+                            "VND.com.blackrock.Response-Timestamp": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Timestamp assigned to this response, in \"HTTP-date\" format as defined by RFC 7231."
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Aladdin® did not find the resource requested or is unwilling to disclose if it exists. Could indicate a defect in the client program or data which is no longer accessible.",
+                        "schema": {
+                            "description": "Defines an error that occurred.",
+                            "type": "object",
+                            "required": [
+                                "code",
+                                "message"
+                            ],
+                            "properties": {
+                                "code": {
+                                    "description": "A short mnemonic reference code for the error.",
+                                    "type": "string",
+                                    "maxLength": 40
+                                },
+                                "message": {
+                                    "description": "A human readable description of the error.",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "VND.com.blackrock.Request-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "The unique identifier assigned by the client to the request that originated this response."
+                            },
+                            "VND.com.blackrock.Response-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "A Unique Identifier for this response."
+                            },
+                            "VND.com.blackrock.Response-Timestamp": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Timestamp assigned to this response, in \"HTTP-date\" format as defined by RFC 7231."
+                            }
+                        }
+                    }
+                },
+                "x-access-type": "READ",
+                "x-quota-limit": 500
+            }
+        },
+        "/collateralStatements:filter": {
+            "post": {
+                "security": [
+                    {
+                        "APIKeyHeader": [],
+                        "OAuth2AccessCode": [
+                            "investment_operations.collateral_management.collateral_statement.v1.CollateralStatement:read"
+                        ]
+                    },
+                    {
+                        "APIKeyHeader": [],
+                        "OAuth2ClientCredentials": [
+                            "investment_operations.collateral_management.collateral_statement.v1.CollateralStatement:read"
+                        ]
+                    },
+                    {
+                        "APIKeyHeader": [],
+                        "ClientKeyHeader": []
+                    },
+                    {
+                        "APIKeyHeader": [],
+                        "basicAuth": []
+                    }
+                ],
+                "description": "Allows for retrieval of collateral statement and detail records by various criteria",
+                "summary": "Filter Collateral Statement Records",
+                "operationId": "CollateralStatementAPI_FilterCollateralStatements",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "UUID",
+                        "description": "A unique identifier for this request.",
+                        "name": "VND.com.blackrock.Request-ID",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Timestamp assigned to this request at origin, in \"HTTP-date\" format as defined by RFC 7231.",
+                        "name": "VND.com.blackrock.Origin-Timestamp",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1FilterCollateralStatementsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/v1LongrunningOperation"
+                        },
+                        "x-aladdin-lro": {
+                            "meta-data-type": {
+                                "$ref": "#/definitions/v1FilterCollateralStatementsMeta"
+                            },
+                            "response-type": {
+                                "$ref": "#/definitions/v1FilterCollateralStatementsResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Aladdin® will not process the request due to an apparent client error.",
+                        "schema": {
+                            "description": "Defines an error that occurred.",
+                            "type": "object",
+                            "required": [
+                                "code",
+                                "message"
+                            ],
+                            "properties": {
+                                "code": {
+                                    "description": "A short mnemonic reference code for the error.",
+                                    "type": "string",
+                                    "maxLength": 40
+                                },
+                                "message": {
+                                    "description": "A human readable description of the error.",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "VND.com.blackrock.Request-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "The unique identifier assigned by the client to the request that originated this response."
+                            },
+                            "VND.com.blackrock.Response-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "A Unique Identifier for this response."
+                            },
+                            "VND.com.blackrock.Response-Timestamp": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Timestamp assigned to this response, in \"HTTP-date\" format as defined by RFC 7231."
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Aladdin® will not process the request as the necessary credentials were not provided or were invalid.",
+                        "schema": {
+                            "description": "Defines an error that occurred.",
+                            "type": "object",
+                            "required": [
+                                "code",
+                                "message"
+                            ],
+                            "properties": {
+                                "code": {
+                                    "description": "A short mnemonic reference code for the error.",
+                                    "type": "string",
+                                    "maxLength": 40
+                                },
+                                "message": {
+                                    "description": "A human readable description of the error.",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "VND.com.blackrock.Request-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "The unique identifier assigned by the client to the request that originated this response."
+                            },
+                            "VND.com.blackrock.Response-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "A Unique Identifier for this response."
+                            },
+                            "VND.com.blackrock.Response-Timestamp": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Timestamp assigned to this response, in \"HTTP-date\" format as defined by RFC 7231."
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Aladdin® understood the request but is refusing to authorize it.",
+                        "schema": {
+                            "description": "Defines an error that occurred.",
+                            "type": "object",
+                            "required": [
+                                "code",
+                                "message"
+                            ],
+                            "properties": {
+                                "code": {
+                                    "description": "A short mnemonic reference code for the error.",
+                                    "type": "string",
+                                    "maxLength": 40
+                                },
+                                "message": {
+                                    "description": "A human readable description of the error.",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "VND.com.blackrock.Request-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "The unique identifier assigned by the client to the request that originated this response."
+                            },
+                            "VND.com.blackrock.Response-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "A Unique Identifier for this response."
+                            },
+                            "VND.com.blackrock.Response-Timestamp": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Timestamp assigned to this response, in \"HTTP-date\" format as defined by RFC 7231."
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Aladdin® did not find the resource requested or is unwilling to disclose if it exists. Could indicate a defect in the client program or data which is no longer accessible.",
+                        "schema": {
+                            "description": "Defines an error that occurred.",
+                            "type": "object",
+                            "required": [
+                                "code",
+                                "message"
+                            ],
+                            "properties": {
+                                "code": {
+                                    "description": "A short mnemonic reference code for the error.",
+                                    "type": "string",
+                                    "maxLength": 40
+                                },
+                                "message": {
+                                    "description": "A human readable description of the error.",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "VND.com.blackrock.Request-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "The unique identifier assigned by the client to the request that originated this response."
+                            },
+                            "VND.com.blackrock.Response-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "A Unique Identifier for this response."
+                            },
+                            "VND.com.blackrock.Response-Timestamp": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Timestamp assigned to this response, in \"HTTP-date\" format as defined by RFC 7231."
+                            }
+                        }
+                    }
+                },
+                "x-access-type": "READ",
+                "x-quota-limit": 500
+            }
+        },
+        "/longRunningOperations/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "APIKeyHeader": [],
+                        "OAuth2AccessCode": [
+                            "investment_operations.collateral_management.collateral_statement.v1.CollateralStatement"
+                        ]
+                    },
+                    {
+                        "APIKeyHeader": [],
+                        "OAuth2ClientCredentials": [
+                            "investment_operations.collateral_management.collateral_statement.v1.CollateralStatement"
+                        ]
+                    },
+                    {
+                        "APIKeyHeader": [],
+                        "ClientKeyHeader": []
+                    },
+                    {
+                        "APIKeyHeader": [],
+                        "basicAuth": []
+                    }
+                ],
+                "description": "Clients can use this method to poll the operation result at intervals as recommended by the API service.",
+                "summary": "Gets the state of a long-running operation",
+                "operationId": "CollateralStatementAPI_GetLongrunningOperation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "UUID",
+                        "description": "A unique identifier for this request.",
+                        "name": "VND.com.blackrock.Request-ID",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Timestamp assigned to this request at origin, in \"HTTP-date\" format as defined by RFC 7231.",
+                        "name": "VND.com.blackrock.Origin-Timestamp",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Id of the LongrunningOperation",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "schema": {
+                            "$ref": "#/definitions/v1LongrunningOperation"
+                        },
+                        "x-aladdin-lro": {}
+                    },
+                    "400": {
+                        "description": "Aladdin® will not process the request due to an apparent client error.",
+                        "schema": {
+                            "description": "Defines an error that occurred.",
+                            "type": "object",
+                            "required": [
+                                "code",
+                                "message"
+                            ],
+                            "properties": {
+                                "code": {
+                                    "description": "A short mnemonic reference code for the error.",
+                                    "type": "string",
+                                    "maxLength": 40
+                                },
+                                "message": {
+                                    "description": "A human readable description of the error.",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "VND.com.blackrock.Request-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "The unique identifier assigned by the client to the request that originated this response."
+                            },
+                            "VND.com.blackrock.Response-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "A Unique Identifier for this response."
+                            },
+                            "VND.com.blackrock.Response-Timestamp": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Timestamp assigned to this response, in \"HTTP-date\" format as defined by RFC 7231."
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Aladdin® will not process the request as the necessary credentials were not provided or were invalid.",
+                        "schema": {
+                            "description": "Defines an error that occurred.",
+                            "type": "object",
+                            "required": [
+                                "code",
+                                "message"
+                            ],
+                            "properties": {
+                                "code": {
+                                    "description": "A short mnemonic reference code for the error.",
+                                    "type": "string",
+                                    "maxLength": 40
+                                },
+                                "message": {
+                                    "description": "A human readable description of the error.",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "VND.com.blackrock.Request-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "The unique identifier assigned by the client to the request that originated this response."
+                            },
+                            "VND.com.blackrock.Response-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "A Unique Identifier for this response."
+                            },
+                            "VND.com.blackrock.Response-Timestamp": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Timestamp assigned to this response, in \"HTTP-date\" format as defined by RFC 7231."
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Aladdin® understood the request but is refusing to authorize it.",
+                        "schema": {
+                            "description": "Defines an error that occurred.",
+                            "type": "object",
+                            "required": [
+                                "code",
+                                "message"
+                            ],
+                            "properties": {
+                                "code": {
+                                    "description": "A short mnemonic reference code for the error.",
+                                    "type": "string",
+                                    "maxLength": 40
+                                },
+                                "message": {
+                                    "description": "A human readable description of the error.",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "VND.com.blackrock.Request-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "The unique identifier assigned by the client to the request that originated this response."
+                            },
+                            "VND.com.blackrock.Response-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "A Unique Identifier for this response."
+                            },
+                            "VND.com.blackrock.Response-Timestamp": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Timestamp assigned to this response, in \"HTTP-date\" format as defined by RFC 7231."
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Aladdin® did not find the resource requested or is unwilling to disclose if it exists. Could indicate a defect in the client program or data which is no longer accessible.",
+                        "schema": {
+                            "description": "Defines an error that occurred.",
+                            "type": "object",
+                            "required": [
+                                "code",
+                                "message"
+                            ],
+                            "properties": {
+                                "code": {
+                                    "description": "A short mnemonic reference code for the error.",
+                                    "type": "string",
+                                    "maxLength": 40
+                                },
+                                "message": {
+                                    "description": "A human readable description of the error.",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "VND.com.blackrock.Request-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "The unique identifier assigned by the client to the request that originated this response."
+                            },
+                            "VND.com.blackrock.Response-ID": {
+                                "type": "string",
+                                "format": "UUID",
+                                "description": "A Unique Identifier for this response."
+                            },
+                            "VND.com.blackrock.Response-Timestamp": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "Timestamp assigned to this response, in \"HTTP-date\" format as defined by RFC 7231."
+                            }
+                        }
+                    }
+                },
+                "x-quota-limit": 500
+            }
+        }
+    },
+    "definitions": {
+        "Any": {
+            "description": "`Any` contains an arbitrary serialized message along with a\nURL that describes the type of the serialized message",
+            "type": "object",
+            "properties": {
+                "@type": {
+                    "description": "A URL/resource name that uniquely identifies the type of the serialized message.",
+                    "type": "string"
+                }
+            }
+        },
+        "brokerBrokerReference": {
+            "description": "Reference to a broker: this include the broker id, broker ticker and broker shortname.\nFor read operations, all fields are returned.\nFor write operations, at least one field is required. If multiple fields are provided, broker_id takes precedence followed by broker_shortname.",
+            "type": "object",
+            "properties": {
+                "brokerId": {
+                    "type": "string",
+                    "title": "broker id"
+                },
+                "brokerTicker": {
+                    "type": "string",
+                    "title": "broker ticker"
+                },
+                "brokerShortname": {
+                    "type": "string",
+                    "title": "broker shortname - display name for the broker across Aladdin apps"
+                }
+            }
+        },
+        "portfolioPortfolioReference": {
+            "description": "Reference to a portfolio. This includes both the portfolio ID and the portfolio ticker. \nFor read operations, both fields are returned. \nFor write operations, only one of the two is required. \nIf both are provided, the portfolio ID takes precedence over the portfolio ticker.",
+            "type": "object",
+            "properties": {
+                "portfolioId": {
+                    "type": "string",
+                    "title": "portfolio id"
+                },
+                "portfolioTicker": {
+                    "type": "string",
+                    "title": "portfolio ticker"
+                }
+            }
+        },
+        "rpcStatus": {
+            "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). Each `Status` message contains\nthree pieces of data: error code, error message, and error details.\n\nYou can find out more about this error model and how to work with it in the\n[API Design Guide](https://cloud.google.com/apis/design/errors).",
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "message": {
+                    "description": "A developer-facing error message, which should be in English. Any\nuser-facing error message should be localized and sent in the\n[google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.",
+                    "type": "string"
+                },
+                "details": {
+                    "description": "A list of messages that carry the error details.  There is a common set of\nmessage types for APIs to use.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Any"
+                    }
+                }
+            }
+        },
+        "v1AssetSummary": {
+            "type": "object",
+            "title": "Asset attributes summary",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "title": "Aladdin asset Identifier. This is same as Asset ID",
+                    "required": [
+                        "id"
+                    ]
+                },
+                "securityDescription": {
+                    "type": "string",
+                    "title": "Security Description"
+                },
+                "securityGroup": {
+                    "type": "string",
+                    "title": "Security group of an asset"
+                },
+                "securityType": {
+                    "type": "string",
+                    "title": "Security type of an asset"
+                },
+                "maturityDate": {
+                    "type": "string",
+                    "format": "date",
+                    "title": "Maturity date"
+                },
+                "issueCountryCode": {
+                    "type": "string",
+                    "title": "Country of Issue of Asset"
+                },
+                "marketCountryCode": {
+                    "type": "string",
+                    "title": "Asset Trading market an ISO code to identify markets, trading platforms"
+                },
+                "currencyCode": {
+                    "type": "string",
+                    "title": "The currency's ISO code"
+                },
+                "ticker": {
+                    "type": "string",
+                    "title": "Aladdin Asset Ticker - a unique series of letters assigned to a security for trading purposes"
+                },
+                "riskCountryCode": {
+                    "type": "string",
+                    "title": "Country of risk i.e which buys the asset"
+                },
+                "benchmarkAssetId": {
+                    "description": "benchmark portfolio or a security corresponding to an asset id.",
+                    "type": "string"
+                },
+                "issueDate": {
+                    "description": "Issue Date represents the date the Security/Asset was issued.",
+                    "type": "string",
+                    "format": "date"
+                },
+                "accrualDate": {
+                    "description": "Accrual Date represents the Valuation Date for the Asset.",
+                    "type": "string",
+                    "format": "date"
+                },
+                "coupon": {
+                    "description": "Represents the coupon value.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "assetIdentifiers": {
+                    "type": "array",
+                    "title": "Additional market AssetIdentifier",
+                    "items": {
+                        "$ref": "#/definitions/v1MarketCode"
+                    }
+                }
+            }
+        },
+        "v1BatchCreateCollateralStatementsResponse": {
+            "type": "object",
+            "title": "Response for batch collateral statements",
+            "properties": {
+                "results": {
+                    "type": "array",
+                    "title": "Create collection collateral statement API responses",
+                    "items": {
+                        "$ref": "#/definitions/v1CreateCollateralStatementResult"
+                    }
+                }
+            }
+        },
+        "v1BatchUpdateCollateralStatementsResponse": {
+            "type": "object",
+            "title": "Response for batch update collateral statements",
+            "properties": {
+                "results": {
+                    "type": "array",
+                    "title": "Create collection collateral statement API responses",
+                    "items": {
+                        "$ref": "#/definitions/v1UpdateCollateralStatementResult"
+                    }
+                }
+            }
+        },
+        "v1CollateralAgreementSummary": {
+            "type": "object",
+            "title": "Collateral legal agreement request to get agreement details",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "title": "Id describes the agreement id"
+                },
+                "agreementType": {
+                    "type": "string",
+                    "title": "Agreement type"
+                },
+                "agreementName": {
+                    "type": "string",
+                    "title": "Agreement name"
+                },
+                "externalName": {
+                    "type": "string",
+                    "title": "External name"
+                },
+                "agreementVersion": {
+                    "type": "string",
+                    "title": "Agreement version"
+                },
+                "agreementCurrency": {
+                    "type": "string",
+                    "title": "Currency describes the agreement currency"
+                },
+                "marginType": {
+                    "type": "string",
+                    "title": "Margin type"
+                },
+                "indAmountNetting": {
+                    "type": "string",
+                    "title": "Independent amount netting"
+                },
+                "roundingAmt": {
+                    "description": "Represents rounding amount.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "rehypothecationRightsFund": {
+                    "description": "Represents rehypothecation rights for fund.",
+                    "type": "string"
+                },
+                "rehypothecationRightsBroker": {
+                    "description": "Represents rehypothecation rights for broker.",
+                    "type": "string"
+                },
+                "overriddenAmt": {
+                    "description": "Represents overridden amount.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "transferTiming": {
+                    "description": "Represents transfer timing.",
+                    "type": "string"
+                },
+                "transferTimingTwo": {
+                    "description": "Represents transfer timing 2.",
+                    "type": "string"
+                },
+                "notificationDeadline": {
+                    "description": "Deadline notification time.",
+                    "type": "integer",
+                    "format": "int32"
+                }
+            }
+        },
+        "v1CollateralCall": {
+            "type": "object",
+            "title": "Represents collateral call related information",
+            "properties": {
+                "agreedCollateralCallAmt": {
+                    "description": "Represents agreed call amount.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "collateralCallComment": {
+                    "description": "Represents call comment.",
+                    "type": "string"
+                },
+                "collateralCallModifyUser": {
+                    "description": "Represents call modified by.",
+                    "type": "string"
+                },
+                "collateralCallModifyTime": {
+                    "description": "Represents call modified time.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "collateralCallStatus": {
+                    "description": "Represents call status.",
+                    "type": "string"
+                },
+                "counterpartyCollateralCallAmt": {
+                    "description": "Represents counterparty call amount.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "disputeReason": {
+                    "description": "Represents dispute reason.",
+                    "type": "string"
+                },
+                "overridenCollateralCallAmt": {
+                    "description": "Represents overriden call amount.",
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "v1CollateralDetails": {
+            "type": "object",
+            "title": "Collateral positions details",
+            "properties": {
+                "positions": {
+                    "type": "array",
+                    "title": "Details of collateral positions",
+                    "items": {
+                        "$ref": "#/definitions/v1Position"
+                    }
+                }
+            }
+        },
+        "v1CollateralStatement": {
+            "description": "Collateral statement describes the collateral statement details.",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "Statement id.",
+                    "type": "string"
+                },
+                "externalEntityValue": {
+                    "description": "Counterparty identifier stored in Security Master under Counterparty Reference Number.",
+                    "type": "string"
+                },
+                "brokerIssuer": {
+                    "description": "Represents broker issuer.",
+                    "type": "string"
+                },
+                "statementVersion": {
+                    "description": "Represents version of the statement.",
+                    "type": "string"
+                },
+                "totalExposure": {
+                    "description": "Total exposure.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "independentAmount": {
+                    "description": "Independent amount.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "supportReqFund": {
+                    "description": "Support required by fund.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "supportReqBroker": {
+                    "description": "Support required by broker.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "collateralPlgFund": {
+                    "description": "Collateral pledged by fund.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "collateralPlgBroker": {
+                    "description": "Collateral pledged by broker.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "deliverFund": {
+                    "description": "Amount to deliver by fund.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "deliverBroker": {
+                    "description": "Amount to deliver by broker.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "returnFund": {
+                    "description": "Amount to be returned by fund.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "returnBroker": {
+                    "description": "Amount to be returned by broker.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "totalCollReceive": {
+                    "description": "Total collateral to receive.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "totalCollDeliver": {
+                    "description": "Total collateral to deliver.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "statementDate": {
+                    "description": "Statement date.",
+                    "type": "string",
+                    "format": "date"
+                },
+                "exchangeRate": {
+                    "description": "Exchange rate.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "collateralPriceGroup": {
+                    "description": "Price group.",
+                    "type": "string"
+                },
+                "altPriceGroup": {
+                    "description": "Alternate price group.",
+                    "type": "string"
+                },
+                "createTime": {
+                    "description": "Statement creation time.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "reviewTime": {
+                    "description": "Statement review time.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "reviewedUser": {
+                    "description": "User that reviewed the statement.",
+                    "type": "string"
+                },
+                "statementModifyTime": {
+                    "description": "Statement modification time.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "statementModifyUser": {
+                    "description": "User that modify the statement last.",
+                    "type": "string"
+                },
+                "statementStatus": {
+                    "description": "Represents the status.",
+                    "type": "string"
+                },
+                "statementStatusMessage": {
+                    "description": "Represents the status message.",
+                    "type": "string"
+                },
+                "statementComment": {
+                    "description": "Represents the comments on that statement.",
+                    "type": "string"
+                },
+                "thresholdFund": {
+                    "description": "Threshold amount for the fund.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "thresholdBroker": {
+                    "description": "Threshold amount of broker.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "minTransferAmtFund": {
+                    "description": "Minimum transfer amount of the fund.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "minTransferAmtBroker": {
+                    "description": "Minimum transfer amount of the broker.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "tolerance": {
+                    "description": "Represents tolerance.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "statementCurrency": {
+                    "description": "Represents statement currency.",
+                    "type": "string"
+                },
+                "statementType": {
+                    "description": "Represents statement type.",
+                    "type": "string"
+                },
+                "statementRegion": {
+                    "description": "Represents statement region.",
+                    "type": "string"
+                },
+                "reportName": {
+                    "description": "Represents the parent statement id (report_name).",
+                    "type": "string"
+                },
+                "collateralCall": {
+                    "description": "Represents the Collateral Call.",
+                    "$ref": "#/definitions/v1CollateralCall"
+                },
+                "collateralExposure": {
+                    "description": "Represents the Collateral Exposures for the statement.",
+                    "$ref": "#/definitions/v1ExposureDetails"
+                },
+                "collateralPledged": {
+                    "description": "Represents the Collateral Pledged.",
+                    "$ref": "#/definitions/v1CollateralDetails"
+                },
+                "collateralHeld": {
+                    "description": "Represents the Collateral Held.",
+                    "$ref": "#/definitions/v1CollateralDetails"
+                },
+                "totalExchangeCommission": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Counterparty clearing house (CCP) commissions"
+                },
+                "totalDerivativeClearingMerchantCommission": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Derivative clearing merchant commissions"
+                },
+                "totalOtherCommission": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Other commissions"
+                },
+                "totalFee": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Total fees"
+                },
+                "totalPriceAlignmentInterest": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Total sum of Price Alignment Interest"
+                },
+                "totalCoupon": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Total coupons"
+                },
+                "exchangeCode": {
+                    "type": "string",
+                    "title": "Code of the exchange"
+                },
+                "thirdPartyExposure": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Third party exposure"
+                },
+                "totalRiskExposure": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Total risk exposure (VAR)"
+                },
+                "marginCallType": {
+                    "type": "string",
+                    "title": "Type of margin call: IM/VM/M"
+                },
+                "portfolioReference": {
+                    "title": "Aladdin portfolio information",
+                    "$ref": "#/definitions/portfolioPortfolioReference"
+                },
+                "brokerReference": {
+                    "title": "Aladdin broker information",
+                    "$ref": "#/definitions/brokerBrokerReference"
+                },
+                "collateralAgreementSummary": {
+                    "description": "Details of the collateral agreement.",
+                    "$ref": "#/definitions/v1CollateralAgreementSummary"
+                },
+                "statementSubType": {
+                    "description": "Captures the sub-category of the statement business flow. Decode: DECO_ST_SUBTYPE.",
+                    "type": "string"
+                }
+            }
+        },
+        "v1CreateCollateralStatementRequest": {
+            "type": "object",
+            "title": "Request for individual collateral statement",
+            "properties": {
+                "collateralStatement": {
+                    "title": "Collateral statement",
+                    "$ref": "#/definitions/v1CollateralStatement"
+                }
+            }
+        },
+        "v1CreateCollateralStatementResult": {
+            "type": "object",
+            "title": "Result for individual collateral statement",
+            "properties": {
+                "error": {
+                    "description": "The error result of the operation in case of failure or cancellation.",
+                    "$ref": "#/definitions/rpcStatus"
+                },
+                "output": {
+                    "description": "The normal response of the operation in case of success.",
+                    "$ref": "#/definitions/v1CollateralStatement"
+                }
+            }
+        },
+        "v1DecoAgreementType": {
+            "description": "- DECO_AGREEMENT_TYPE_UNSPECIFIED: DECO agreement type unspecified\n - DECO_AGREEMENT_TYPE_ISDA: DECO agreement type ISDA w/ CSA\n - DECO_AGREEMENT_TYPE_INC: DECO agreement type ISDA w/o CSA\n - DECO_AGREEMENT_TYPE_ISCO: DECO agreement type ISDA Client Own\n - DECO_AGREEMENT_TYPE_IMUM: DECO agreement type Uncleared Margin IM\n - DECO_AGREEMENT_TYPE_IMUS: DECO agreement type Initial Margin - US SEC/SBS\n - DECO_AGREEMENT_TYPE_IMLB: DECO agreement type Triparty Long Box\n - DECO_AGREEMENT_TYPE_ISFX: DECO agreement type ISDA FX\n - DECO_AGREEMENT_TYPE_ISSC: DECO agreement type Securities Conversion\n - DECO_AGREEMENT_TYPE_SWAO: DECO agreement type Swap - Other\n - DECO_AGREEMENT_TYPE_CFD: DECO agreement type CFD Agreements\n - DECO_AGREEMENT_TYPE_DRV: DECO agreement type Swaps - Rahmenvertrag\n - DECO_AGREEMENT_TYPE_FUT: DECO agreement type FUT\n - DECO_AGREEMENT_TYPE_FUTG: DECO agreement type FUT Give Up\n - DECO_AGREEMENT_TYPE_GMRA: DECO agreement type GMRA\n - DECO_AGREEMENT_TYPE_GMRT: DECO agreement type GMRA Tri\n - DECO_AGREEMENT_TYPE_OTC: DECO agreement type OTC\n - DECO_AGREEMENT_TYPE_PSA: DECO agreement type PSA\n - DECO_AGREEMENT_TYPE_PSAT: DECO agreement type PSA Tri\n - DECO_AGREEMENT_TYPE_SLPN: DECO agreement type SecLend P-Notes\n - DECO_AGREEMENT_TYPE_GSLA: DECO agreement type Global Master Securities Lending Agreement\n - DECO_AGREEMENT_TYPE_MSLA: DECO agreement type Master Securities Lending Agreement\n - DECO_AGREEMENT_TYPE_OSLA: DECO agreement type Overseas Securities Lending Agreement\n - DECO_AGREEMENT_TYPE_SLA: DECO agreement type Securities Lending Agreement\n - DECO_AGREEMENT_TYPE_LOPT: DECO agreement type Listed Options\n - DECO_AGREEMENT_TYPE_MCA: DECO agreement type Master Confirmation Agreement\n - DECO_AGREEMENT_TYPE_DMCA: DECO agreement type DTCC Master Confirmation Agreement\n - DECO_AGREEMENT_TYPE_MTRX: DECO agreement type ISDA Credit Derivatives Physical Settlement Matrix\n - DECO_AGREEMENT_TYPE_STS: DECO agreement type Standard Terms Supplement\n - DECO_AGREEMENT_TYPE_TBA: DECO agreement type MSFTA\n - DECO_AGREEMENT_TYPE_FA: DECO agreement type Futures Addendum\n - DECO_AGREEMENT_TYPE_FAVM: DECO agreement type Futures Addendum VM\n - DECO_AGREEMENT_TYPE_EA: DECO agreement type Execution Agreement\n - DECO_AGREEMENT_TYPE_CCAS: DECO agreement type Central Cpty Acct Setup\n - DECO_AGREEMENT_TYPE_SYNS: DECO agreement type CFD Synthetic Sleeve\n - DECO_AGREEMENT_TYPE_DFEM: DECO agreement type DF2/EMIR\n - DECO_AGREEMENT_TYPE_SUPD: DECO agreement type Supplemental Documentation\n - DECO_AGREEMENT_TYPE_ISAR: DECO agreement type ISDA - Archived\n - DECO_AGREEMENT_TYPE_PBFA: DECO agreement type PB Financing Agreement\n - DECO_AGREEMENT_TYPE_SDAA: DECO agreement type State Deposit Account Agreement\n - DECO_AGREEMENT_TYPE_TMFS: DECO agreement type Threshold Monitoring - Forward Settle\n - DECO_AGREEMENT_TYPE_TMNP: DECO agreement type Threshold Monitoring - Not Papered\n - DECO_AGREEMENT_TYPE_DINSUR: DECO agreement type INSUR-COLL\n - DECO_AGREEMENT_TYPE_PBTB: DECO agreement type PB TBA Clearing\n - DECO_AGREEMENT_TYPE_SCEC: DECO agreement type US Equity/ Corporate Debt\n - DECO_AGREEMENT_TYPE_SCGD: DECO agreement type US Government Debt\n - DECO_AGREEMENT_TYPE_SCIE: DECO agreement type US International Equity\n - DECO_AGREEMENT_TYPE_CRIM: DECO agreement type Repo Initial Margin Addendum\n - DECO_AGREEMENT_TYPE_CRVM: DECO agreement type Repo Varition Margin Addendum",
+            "type": "string",
+            "title": "DECO agreement type",
+            "default": "DECO_AGREEMENT_TYPE_UNSPECIFIED",
+            "enum": [
+                "DECO_AGREEMENT_TYPE_UNSPECIFIED",
+                "DECO_AGREEMENT_TYPE_ISDA",
+                "DECO_AGREEMENT_TYPE_INC",
+                "DECO_AGREEMENT_TYPE_ISCO",
+                "DECO_AGREEMENT_TYPE_IMUM",
+                "DECO_AGREEMENT_TYPE_IMUS",
+                "DECO_AGREEMENT_TYPE_IMLB",
+                "DECO_AGREEMENT_TYPE_ISFX",
+                "DECO_AGREEMENT_TYPE_ISSC",
+                "DECO_AGREEMENT_TYPE_SWAO",
+                "DECO_AGREEMENT_TYPE_CFD",
+                "DECO_AGREEMENT_TYPE_DRV",
+                "DECO_AGREEMENT_TYPE_FUT",
+                "DECO_AGREEMENT_TYPE_FUTG",
+                "DECO_AGREEMENT_TYPE_GMRA",
+                "DECO_AGREEMENT_TYPE_GMRT",
+                "DECO_AGREEMENT_TYPE_OTC",
+                "DECO_AGREEMENT_TYPE_PSA",
+                "DECO_AGREEMENT_TYPE_PSAT",
+                "DECO_AGREEMENT_TYPE_SLPN",
+                "DECO_AGREEMENT_TYPE_GSLA",
+                "DECO_AGREEMENT_TYPE_MSLA",
+                "DECO_AGREEMENT_TYPE_OSLA",
+                "DECO_AGREEMENT_TYPE_SLA",
+                "DECO_AGREEMENT_TYPE_LOPT",
+                "DECO_AGREEMENT_TYPE_MCA",
+                "DECO_AGREEMENT_TYPE_DMCA",
+                "DECO_AGREEMENT_TYPE_MTRX",
+                "DECO_AGREEMENT_TYPE_STS",
+                "DECO_AGREEMENT_TYPE_TBA",
+                "DECO_AGREEMENT_TYPE_FA",
+                "DECO_AGREEMENT_TYPE_FAVM",
+                "DECO_AGREEMENT_TYPE_EA",
+                "DECO_AGREEMENT_TYPE_CCAS",
+                "DECO_AGREEMENT_TYPE_SYNS",
+                "DECO_AGREEMENT_TYPE_DFEM",
+                "DECO_AGREEMENT_TYPE_SUPD",
+                "DECO_AGREEMENT_TYPE_ISAR",
+                "DECO_AGREEMENT_TYPE_PBFA",
+                "DECO_AGREEMENT_TYPE_SDAA",
+                "DECO_AGREEMENT_TYPE_TMFS",
+                "DECO_AGREEMENT_TYPE_TMNP",
+                "DECO_AGREEMENT_TYPE_DINSUR",
+                "DECO_AGREEMENT_TYPE_PBTB",
+                "DECO_AGREEMENT_TYPE_SCEC",
+                "DECO_AGREEMENT_TYPE_SCGD",
+                "DECO_AGREEMENT_TYPE_SCIE",
+                "DECO_AGREEMENT_TYPE_CRIM",
+                "DECO_AGREEMENT_TYPE_CRVM"
+            ]
+        },
+        "v1DecoStatementType": {
+            "description": "- DECO_STATEMENT_TYPE_UNSPECIFIED: Unspecified DECO statement type\n - DECO_STATEMENT_TYPE_A: DECO statement type cleared\n - DECO_STATEMENT_TYPE_B: DECO statement type exchange traded derivatives\n - DECO_STATEMENT_TYPE_C: DECO statement type cleared\n - DECO_STATEMENT_TYPE_D: DECO statement type OTC bilateral\n - DECO_STATEMENT_TYPE_E: DECO statement type exchange traded derivatives\n - DECO_STATEMENT_TYPE_L: DECO statement type Sec Lending Cash\n - DECO_STATEMENT_TYPE_R: DECO statement type CFD rate reset\n - DECO_STATEMENT_TYPE_S: DECO statement type substitution\n - DECO_STATEMENT_TYPE_U: DECO statement type OTC bilateral\n - DECO_STATEMENT_TYPE_H: DECO statement type Sec Lending Non Cash\n - DECO_STATEMENT_TYPE_O: DECO statement type Cleared Repo\n - DECO_STATEMENT_TYPE_M: DECO statement type End-of-day\n - DECO_STATEMENT_TYPE_X: DECO statement type cancelled\n - DECO_STATEMENT_TYPE_UMR: DECO statement type bilateral",
+            "type": "string",
+            "title": "DECO statement type",
+            "default": "DECO_STATEMENT_TYPE_UNSPECIFIED",
+            "enum": [
+                "DECO_STATEMENT_TYPE_UNSPECIFIED",
+                "DECO_STATEMENT_TYPE_A",
+                "DECO_STATEMENT_TYPE_B",
+                "DECO_STATEMENT_TYPE_C",
+                "DECO_STATEMENT_TYPE_D",
+                "DECO_STATEMENT_TYPE_E",
+                "DECO_STATEMENT_TYPE_L",
+                "DECO_STATEMENT_TYPE_R",
+                "DECO_STATEMENT_TYPE_S",
+                "DECO_STATEMENT_TYPE_U",
+                "DECO_STATEMENT_TYPE_H",
+                "DECO_STATEMENT_TYPE_O",
+                "DECO_STATEMENT_TYPE_M",
+                "DECO_STATEMENT_TYPE_X",
+                "DECO_STATEMENT_TYPE_UMR"
+            ]
+        },
+        "v1Exposure": {
+            "type": "object",
+            "title": "Represents exposure related information",
+            "properties": {
+                "independentAmount": {
+                    "description": "Independent amount.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "dv01": {
+                    "description": "Represents dv01.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "vega": {
+                    "description": "Represents vega.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "thirdPartyExposure": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Collateral exposure calculated by a third party"
+                },
+                "supportRequired": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Asset-level support_required, the exposure value adjusted by the net money on the trade\n(-- api-linter: core::0203::required=disabled\n aip.dev/not-precedent: The required in the description does not mean this is must-have field ... --)"
+                },
+                "assetLevelExposure": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Asset-level exposure"
+                }
+            }
+        },
+        "v1ExposureDetails": {
+            "type": "object",
+            "title": "Portfolio exposure details",
+            "properties": {
+                "exposures": {
+                    "type": "array",
+                    "title": "Details of portfolio exposures",
+                    "items": {
+                        "$ref": "#/definitions/v1Position"
+                    }
+                }
+            }
+        },
+        "v1FilterCollateralStatementsMeta": {
+            "type": "object",
+            "title": "The metadata of the LRO CollateralStatementAPI.FilterCollateralStatement"
+        },
+        "v1FilterCollateralStatementsQuery": {
+            "description": "The query with the parameters needed to perform a filter operation.",
+            "type": "object",
+            "required": [
+                "statementDate"
+            ],
+            "properties": {
+                "portfolioId": {
+                    "description": "Filter by Aladdin portfolio code.",
+                    "type": "string"
+                },
+                "brokerId": {
+                    "description": "Filter by Aladdin broker code.",
+                    "type": "string"
+                },
+                "statementDate": {
+                    "description": "Filter the results by the statement date.",
+                    "type": "string",
+                    "format": "date",
+                    "required": [
+                        "statement_date"
+                    ]
+                },
+                "statementType": {
+                    "description": "Filter the results by type of collateral statement.",
+                    "$ref": "#/definitions/v1DecoStatementType"
+                },
+                "statementDetailEnrichmentFlag": {
+                    "description": "Flag to control the level of enrichment of the collateral data.",
+                    "type": "boolean"
+                },
+                "assetEnrichmentFlag": {
+                    "description": "Flag to control the level of enrichment of the collateral asset data.",
+                    "type": "boolean"
+                },
+                "agreementType": {
+                    "description": "Filter the results for type of collateral agreement.",
+                    "$ref": "#/definitions/v1DecoAgreementType"
+                },
+                "externEntity": {
+                    "description": "Filter the results based on an extern entity value.",
+                    "type": "string"
+                },
+                "uncollateralFlag": {
+                    "description": "Flag to extract uncollateralized statements.",
+                    "type": "boolean"
+                },
+                "clearedFlag": {
+                    "description": "Flag to extract uncleared statements only.",
+                    "type": "boolean"
+                },
+                "portfolioGroupId": {
+                    "description": "Get statements for a portfolio group.",
+                    "type": "string"
+                },
+                "portfolioTicker": {
+                    "description": "Filter the results for type of  portfolio name.",
+                    "type": "string"
+                },
+                "brokerShortName": {
+                    "description": "Filter the results for type of broker short name.",
+                    "type": "string"
+                },
+                "modifiedAfterTime": {
+                    "description": "(-- api-linter: core::0140::prepositions=disabled\n    aip.dev/not-precedent: For the query it needs to be clear that we will retrieve statements after\n    the timestamp provided. --)\n(-- api-linter: core::0142::time-field-names=disabled\n    aip.dev/not-precedent: This is the most descriptive name for the query parameter.  --)\nFilter the results for statements generated after a given timestamp.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "excludeCollateralPledgeHeldFlag": {
+                    "description": "Flag to extract uncleared pledge held flag.",
+                    "type": "boolean"
+                },
+                "bilateralFlag": {
+                    "description": "Flag to extract bilateral report, it will exclude  cancelled statement .",
+                    "type": "boolean"
+                }
+            }
+        },
+        "v1FilterCollateralStatementsRequest": {
+            "type": "object",
+            "title": "The request message for CollateralStatementAPI.FilterCollateralStatement",
+            "properties": {
+                "query": {
+                    "description": "Query used to filter CollateralStatement.",
+                    "$ref": "#/definitions/v1FilterCollateralStatementsQuery"
+                },
+                "pageSize": {
+                    "description": "The maximum number of collateral statement records. The service may\nreturn fewer than this value. If unspecified, at most 500\ncollateral statement records will be returned. The maximum value is 2000; values\nabove 500 will be coerced to 500.",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "pageToken": {
+                    "description": "A page token, received from a previous 'CollateralStatement' call.\nProvide this to retrieve the subsequent page.\n\nWhen paginating, all other parameters provided to\n'CollateralStatement' must match the call that provided the page\ntoken.",
+                    "type": "string"
+                }
+            }
+        },
+        "v1FilterCollateralStatementsResponse": {
+            "description": "The response for filter collateral statement method.",
+            "type": "object",
+            "properties": {
+                "collateralStatements": {
+                    "description": "The lending trading indicator entities that match the specified FilterCollateralStatementRequest.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1CollateralStatement"
+                    }
+                },
+                "responseNote": {
+                    "type": "string",
+                    "title": "Response note sent to the frontend if the statements are truncated"
+                },
+                "nextPageToken": {
+                    "description": "A token, which can be sent as 'page_token' to retrieve the next page.\nIf this field is omitted, there are no subsequent pages.",
+                    "type": "string"
+                }
+            }
+        },
+        "v1LongrunningOperation": {
+            "description": "LongrunningOperation represents a long-running operation that is the result\nof a network API call.",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "The server-assigned id, which is only unique within the same service that\noriginally returns it. If you use the default HTTP mapping, the\n`id` should have the format of `operations/some/unique/id`.",
+                    "type": "string"
+                },
+                "meta": {
+                    "description": "Service-specific metadata associated with the operation.  It typically\ncontains progress information and common metadata such as create time.\nSome services might not provide such metadata.  Any method that returns a\nlong-running operation should document the metadata type, if any.",
+                    "$ref": "#/definitions/Any"
+                },
+                "done": {
+                    "description": "If the value is `false`, it means the operation is still in progress.\nIf true, the operation is completed, and either `error` or `response` is\navailable.",
+                    "type": "boolean"
+                },
+                "error": {
+                    "description": "The error result of the operation in case of failure or cancellation.",
+                    "$ref": "#/definitions/rpcStatus"
+                },
+                "response": {
+                    "description": "The normal response of the operation in case of success.  If the original\nmethod returns no data on success, such as `Delete`, the response is\n`google.protobuf.Empty`.  If the original method is standard\n`Get`/`Create`/`Update`, the response should be the resource.  For other\nmethods, the response should have the type `XxxResponse`, where `Xxx`\nis the original method name.  For example, if the original method name\nis `TakeSnapshot()`, the inferred response type is\n`TakeSnapshotResponse`.",
+                    "$ref": "#/definitions/Any"
+                }
+            }
+        },
+        "v1MarketCode": {
+            "type": "object",
+            "title": "Market code represents a market ID, like ISIN or SEDOL",
+            "required": [
+                "id",
+                "idType",
+                "idValue"
+            ],
+            "properties": {
+                "id": {
+                    "description": "Asset identifier associated with this market code.",
+                    "type": "string",
+                    "title": "Asset identifier",
+                    "required": [
+                        "id"
+                    ]
+                },
+                "idType": {
+                    "type": "string",
+                    "title": "(-- api-linter: aladdin::0901::dictionary-message-field=disabled\n    aip.dev/not-precedent: Open-ended connected to Decodes. --)\nType of security identifier eg ISIN, SEDOL, CIN, RIC etc.\nUse the exact string value from the decde column from B_ALIAS decodes table. For example, identifierType = 'ISIN (ISO)\"",
+                    "required": [
+                        "id_type"
+                    ]
+                },
+                "idValue": {
+                    "description": "Value of the security identifier.",
+                    "type": "string",
+                    "required": [
+                        "id_value"
+                    ]
+                },
+                "idCode": {
+                    "description": "Represents the alias code. This field is optional when the identifierType is a public identifier like RIC, ISIN, SEDOL, etc.",
+                    "type": "integer",
+                    "format": "int32"
+                }
+            }
+        },
+        "v1Position": {
+            "description": "Represents the position for exposures and collateral held/pledged.",
+            "type": "object",
+            "properties": {
+                "asset": {
+                    "description": "Asset details.",
+                    "$ref": "#/definitions/v1AssetSummary"
+                },
+                "invnum": {
+                    "description": "Inventory number.",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "systemPrice": {
+                    "title": "Represents system price",
+                    "$ref": "#/definitions/v1Price"
+                },
+                "altPrice": {
+                    "title": "Represents alternate price",
+                    "$ref": "#/definitions/v1Price"
+                },
+                "userPrice": {
+                    "title": "Represents user price",
+                    "$ref": "#/definitions/v1Price"
+                },
+                "originalFace": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Original face value"
+                },
+                "currentFace": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Current face value"
+                },
+                "notional": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Notional value"
+                },
+                "tradeNumber": {
+                    "description": "Represents trade number.",
+                    "type": "string"
+                },
+                "exchangeRate": {
+                    "description": "Represents exchange rate.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "positionStatus": {
+                    "description": "Represents status.",
+                    "type": "string"
+                },
+                "positionStatusMessage": {
+                    "description": "Represents status message.",
+                    "type": "string"
+                },
+                "positionValueStatus": {
+                    "description": "Valuation status. This will contain error if there was an issue with the exposure calculation such as missing prices.",
+                    "type": "string"
+                },
+                "positionValueStatusMessage": {
+                    "description": "Long explation of the valuation status and also additional information such as assignment status.",
+                    "type": "string"
+                },
+                "convexity": {
+                    "description": "Represents convexity.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "positionDuration": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Represents duration.\n(-- api-linter: core::0142::time-field-type=disabled\n    aip.dev/not-precedent: We need to do this because duration is not a time but a double value. --)"
+                },
+                "interestBase": {
+                    "description": "Represents interest base.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "tranType": {
+                    "description": "Represents transaction type.",
+                    "type": "string"
+                },
+                "riskKey": {
+                    "description": "Represents risk key.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "recordType": {
+                    "description": "MTM = Mark to market, STL = Unsettled trade proceeds, PMT = Swap payments marked as failed in Paycheck  or NULL for Collateral.",
+                    "type": "string"
+                },
+                "positionSettleDate": {
+                    "description": "Represents settle date.",
+                    "type": "string",
+                    "format": "date"
+                },
+                "positionTradeDate": {
+                    "description": "Represents trade date.",
+                    "type": "string",
+                    "format": "date"
+                },
+                "splitNumber": {
+                    "description": "Represents split number.",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "settleStatus": {
+                    "description": "Represents settle status.",
+                    "type": "string"
+                },
+                "collateralExposureType": {
+                    "description": "Represents collateral exposure type.",
+                    "type": "string"
+                },
+                "collateralPositionModifyUser": {
+                    "description": "Represents modified by.",
+                    "type": "string"
+                },
+                "collateralPositionModifyTime": {
+                    "description": "Represents modified time.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "collateralPositionComment": {
+                    "description": "Represents comments on that position.",
+                    "type": "string"
+                },
+                "collateralDetailValue": {
+                    "description": "Represents the collateral exposure/pledged/held value.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "exposure": {
+                    "description": "Represents exposure.",
+                    "$ref": "#/definitions/v1Exposure"
+                },
+                "childCode": {
+                    "type": "string",
+                    "title": "Represents sleeve fund"
+                },
+                "collateralValuationPct": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Valuation percent. Also referred to as the haircut"
+                },
+                "tradeBrokerName": {
+                    "type": "string",
+                    "title": "Represents trade broker name"
+                },
+                "collateralDetailVersion": {
+                    "type": "string",
+                    "title": "Represents collateral detail version"
+                },
+                "tradeExternalCode": {
+                    "type": "string",
+                    "title": "External trade id"
+                },
+                "previousMarkToMarket": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "(-- api-linter: core::0140::prepositions=disabled\n    aip.dev/not-precedent: We need to do this due to the business significance of the term MTM. --)\nPrevious mark to market"
+                },
+                "exchangeCode": {
+                    "type": "string",
+                    "title": "Exchange code"
+                },
+                "priceAlignmentInterest": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "(-- api-linter: aladdin::0901::prefix-required-field=disabled\n    aip.dev/not-precedent: Price here is the prefix. It is a qualifier for interest. --)\nPrice alignment interest (PAI)"
+                },
+                "priceAlignmentInterestRate": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "(-- api-linter: aladdin::0901::prefix-required-field=disabled\n    aip.dev/not-precedent: Price here is the prefix. It is a qualifier for interest. --)\nPrice alignment interest rate"
+                },
+                "fees": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "(-- api-linter: core::0144::message-field-plural=disabled\n    aip.dev/not-precedent: We are keeping the commonly used term for sum of fees --)\nFees"
+                },
+                "exchangeCommission": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Counterparty clearing house (CCP) commission"
+                },
+                "derivativeClearingMerchantCommission": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Derivative clearing merchant (DCM) commissions"
+                },
+                "otherCommission": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Other commission"
+                },
+                "riskExposure": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Value at risk"
+                },
+                "portfolioReference": {
+                    "title": "Aladdin portfolio information",
+                    "$ref": "#/definitions/portfolioPortfolioReference"
+                },
+                "positionTolerance": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Position tolerance"
+                },
+                "altExchangeRate": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Alternative exchange rate"
+                },
+                "tradeBrokerReference": {
+                    "title": "Aladdin Trade broker information",
+                    "$ref": "#/definitions/brokerBrokerReference"
+                },
+                "executingBrokerReference": {
+                    "title": "Aladdin Executing broker information",
+                    "$ref": "#/definitions/brokerBrokerReference"
+                },
+                "dirtyPrice": {
+                    "title": "Dirty price, calculated from clean price and accrued interest",
+                    "$ref": "#/definitions/v1Price"
+                },
+                "loanAmount": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Calculated loan amount"
+                },
+                "couponPaymentDate": {
+                    "description": "Coupon payment date.",
+                    "type": "string",
+                    "format": "date"
+                },
+                "coupon": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Trade Coupon"
+                }
+            }
+        },
+        "v1Price": {
+            "type": "object",
+            "title": "Price related information",
+            "properties": {
+                "collateralPrice": {
+                    "description": "Price value.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "collateralPriceDate": {
+                    "description": "Price hierarchy price date from spdb.",
+                    "type": "string",
+                    "format": "date"
+                },
+                "collateralPriceSource": {
+                    "description": "Price hierarchy price source from spdb.",
+                    "type": "string"
+                },
+                "collateralPriceMultiplier": {
+                    "type": "number",
+                    "format": "double",
+                    "title": "Price multiplier"
+                }
+            }
+        },
+        "v1UpdateCollateralStatementRequest": {
+            "type": "object",
+            "title": "Request to update a given statement",
+            "properties": {
+                "collateralStatement": {
+                    "title": "Collateral Statement to update",
+                    "$ref": "#/definitions/v1CollateralStatement"
+                },
+                "allowMissing": {
+                    "type": "boolean",
+                    "title": "Can the target statement be missing"
+                },
+                "updateMask": {
+                    "description": "The list of fields to update.",
+                    "type": "string"
+                }
+            }
+        },
+        "v1UpdateCollateralStatementResult": {
+            "type": "object",
+            "title": "Result for individual collateral statement update",
+            "properties": {
+                "error": {
+                    "title": "The error result of the operation",
+                    "$ref": "#/definitions/rpcStatus"
+                },
+                "output": {
+                    "description": "The normal response of the operation in case of success.",
+                    "$ref": "#/definitions/v1CollateralStatement"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "APIKeyHeader": {
+            "type": "apiKey",
+            "name": "VND.com.blackrock.API-Key",
+            "in": "header"
+        },
+        "ClientKeyHeader": {
+            "type": "apiKey",
+            "name": "X-API-Key",
+            "in": "header"
+        },
+        "OAuth2AccessCode": {
+            "description": "This API uses OAuth 2.0 with the access code flow.",
+            "type": "oauth2",
+            "flow": "accessCode",
+            "authorizationUrl": "https://client.blackrock.com/api/oauth2/default/v1/authorize",
+            "tokenUrl": "https://client.blackrock.com/api/oauth2/default/v1/token",
+            "scopes": {
+                "investment_operations.collateral_management.collateral_statement.v1.CollateralStatement": "This grants access to all endpoints in the investment_operations.collateral_management.collateral_statement.v1.CollateralStatement API",
+                "investment_operations.collateral_management.collateral_statement.v1.CollateralStatement:read": "non-sensitive read",
+                "offline_access": "This keeps you signed in to the app, even when you are not using it."
+            }
+        },
+        "OAuth2ClientCredentials": {
+            "description": "This API uses OAuth 2.0 with the client credentials flow.",
+            "type": "oauth2",
+            "flow": "application",
+            "tokenUrl": "https://client.blackrock.com/api/oauth2/default/v1/token",
+            "scopes": {
+                "investment_operations.collateral_management.collateral_statement.v1.CollateralStatement": "This grants access to all endpoints in the investment_operations.collateral_management.collateral_statement.v1.CollateralStatement API",
+                "investment_operations.collateral_management.collateral_statement.v1.CollateralStatement:read": "non-sensitive read",
+                "offline_access": "This keeps you signed in to the app, even when you are not using it."
+            }
+        },
+        "basicAuth": {
+            "type": "basic"
+        }
+    },
+    "security": [
+        {
+            "APIKeyHeader": [],
+            "OAuth2AccessCode": [
+                "investment_operations.collateral_management.collateral_statement.v1.CollateralStatement",
+                "investment_operations.collateral_management.collateral_statement.v1.CollateralStatement:read",
+                "offline_access"
+            ]
+        },
+        {
+            "APIKeyHeader": [],
+            "OAuth2ClientCredentials": [
+                "investment_operations.collateral_management.collateral_statement.v1.CollateralStatement",
+                "investment_operations.collateral_management.collateral_statement.v1.CollateralStatement:read",
+                "offline_access"
+            ]
+        },
+        {
+            "APIKeyHeader": [],
+            "ClientKeyHeader": []
+        },
+        {
+            "APIKeyHeader": [],
+            "basicAuth": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "Access.Internal"
+        }
+    ],
+    "x-access-level": "Public"
+}
