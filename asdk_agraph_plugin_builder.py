@@ -31,9 +31,9 @@ _ASDK_PLUGIN_MODULE_PREFIX = "asdk_plugin_"
 _openapi_generator_cli_version = "6.6.0"
 _OPENAPI_GENERATOR_JAR_DOWNLOAD_LINK = f'https://artifactory.blackrock.com:9000/artifactory/libs-releases/org/openapitools/openapi-generator-cli/{_openapi_generator_cli_version}/openapi-generator-cli-{_openapi_generator_cli_version}.jar'  # noqa: E501
 platform_os = platform.platform()
-_ASDK_PLUGIN_BUILDER_REPO = os.getcwd()
+_ASDK_PLUGIN_BUILDER_REPO = str(pathlib.Path(__file__).resolve().parent)
 if 'Windows' in platform_os:
-    _ASDK_PLUGIN_BUILDER_REPO = pathlib.PureWindowsPath(os.getcwd()).as_posix()
+    _ASDK_PLUGIN_BUILDER_REPO = pathlib.PureWindowsPath(_ASDK_PLUGIN_BUILDER_REPO).as_posix()
 
 _openapi_generator_jar_filepath = os.path.join(_ASDK_PLUGIN_BUILDER_REPO, 'resources', 'openapi-generator-cli.jar')
 
@@ -182,6 +182,8 @@ def _generate_api_client_using_swagger(plugin_module_name, path_to_agraph_openap
                                   "--api-name-suffix", api_name]
         is_successful = is_successful and _run_command(python_codegen_command,
                                                        message=f"[API: {api_name}-{api_ver}] - Generate python client code using swagger spec")
+        if not is_successful:
+            raise RuntimeError(f"[API: {api_name}-{api_ver}] - Python client generation failed")
 
         # remove any existing files from target logcation to avoid duplication errors
         is_successful = is_successful and _run_command(["rm", "-rf", target_api_directory],
@@ -204,8 +206,11 @@ def _generate_api_client_using_swagger(plugin_module_name, path_to_agraph_openap
         if not pathlib.Path(f"{plugin_pkg_target_location}/requirements.txt").exists():
             cp_command_requirements = ["cp", os.path.join(temp_dir, "requirements.txt"),
                                        os.path.join(plugin_pkg_target_location, "requirements.txt")]
-            _run_command(cp_command_requirements,
+            is_successful = is_successful and _run_command(cp_command_requirements,
                          message=f"[API: {api_name}-{api_ver}] - Copy requirements file under target directory")
+
+    if not is_successful:
+        raise RuntimeError(f"[API: {api_name}-{api_ver}] - Copying generated client files failed")
 
     print(f"[API: {api_name}-{api_ver}] - Openapi codegen steps done. Proceeding with ASDK Plugin updates...")
     _update_asdk_plugin_codegen_section(plugin_module_name=plugin_module_name, api_name=api_name, api_version=api_ver,
@@ -253,7 +258,7 @@ def _create_plugin_content(swagger_bundle_path, plugin_pkg_target_location, plug
         plugin_pkg_target_location (_type_): Target location on build host to create package
         plugin_version (_type_): Version to be added for the plugin's pyproject.toml file
     """
-    plugin_dir_name = os.path.basename(swagger_bundle_path)
+    plugin_dir_name = os.path.basename(os.path.normpath(swagger_bundle_path))
     plugin_module_name = _ASDK_PLUGIN_MODULE_PREFIX + plugin_dir_name
     print(f"\nBegin processing plugin: '{plugin_module_name}'...")
 
@@ -263,7 +268,7 @@ def _create_plugin_content(swagger_bundle_path, plugin_pkg_target_location, plug
     # Read file paths in swagger bundle directory
     api_swagger_files = []
     for plugin_dir_root, _, files in os.walk(swagger_bundle_path):
-        api_swagger_files = [os.path.join(plugin_dir_root, x) for x in files]
+        api_swagger_files.extend(os.path.join(plugin_dir_root, x) for x in sorted(files))
 
     # For each API swagger file, generate python client and copy codegen into target location
     for api_swagger_file in api_swagger_files:
